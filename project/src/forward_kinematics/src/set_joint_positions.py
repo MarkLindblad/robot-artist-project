@@ -113,6 +113,7 @@ def map_keyboard():
 
 def set_joints():
     right = intera_interface.Limb('right')
+    right.set_joint_position_speed(0.03)
     rj = right.joint_names()
     while True:
         current_positions = [right.joint_angle(rj[i]) for i in range(len(rj))]
@@ -120,7 +121,7 @@ def set_joints():
         angles = raw_input("Enter 7 joint angles: ")
         angles = angles.strip().split(", ")
         angles = [float(angle) for angle in angles]
-        while max([abs(angles[i] - current_positions[i]) for i in range(len(rj))]) > 0.005:
+        while max([abs(angles[i] - current_positions[i]) for i in [0, 1, 3, 5, 6]]) > 0.005:
             print("Current positions: ", current_positions)
             print("Desired positions: ", angles)
             right.set_joint_positions({rj[i]: angles[i] for i in range(len(rj))})
