@@ -1,0 +1,15 @@
+roslaunch turtlebot_bringup minimal.launch
+
+rosrun rqt_graph rqt_graph
+
+rosrun rviz rviz
+
+roslaunch lab4_cam run_cam.launch
+
+rosrun image_view image_view image:=/usb_cam/image_raw
+
+roslaunch lab4_cam ar_track.launch
+
+rosrun tf static_transform_publisher 0.014 0 -0.397 1.571 0 0 ar_marker_6 base_link 100
+
+NOTE: REMEMBER TO SET GLOBAL FRAME usb_cam / base_link / ar_marker_#

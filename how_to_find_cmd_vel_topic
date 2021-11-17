@@ -1,0 +1,500 @@
+   20  ls
+   21  cd ros_workspaces/
+   22  ls
+   23  roscore
+   24  rosservice call /turtle1/patrol 1 .2 9 5 0.3
+   25  source devel/setup.bash 
+   26  rosservice call /turtle1/patrol 1 .2 9 5 0.3
+   27  source devel/setup.bash 
+   28  rosrun turtle_patrol patrol_server.py turtle3
+   29  ls
+   30  cd ../ros_workspaces/
+   31  ls
+   32  cd lab2_starter/
+   33  ls
+   34  cd lab2/
+   35  ls
+   36  cd src/
+   37  ls
+   38  cd turtle_patrol/
+   39  ls
+   40  history | grep patrol
+   41  rosrun turtle_patrol patrol_server.py turtle1
+   42  source ../../devel/setup.bash 
+   43  rosrun turtle_patrol patrol_server.py turtle1
+   44  py turtle3
+   45  cd ~
+   46  ls -a
+   47  ssh-keygen
+   48  ls ~/.sh
+   49  ls ~/.ssh
+   50  cd ~/.ssh
+   51  ls
+   52  cat id_rsa.pub 
+   53  cd ..
+   54  ssh-keygen
+   55  ssh-keygen
+   56  cat ~/.ssh/id_rsa.pub 
+   57  cd ros_workspaces/
+   58  git init
+   59  ls -a
+   60  git status
+   61  git add lab1/
+   62  git add lab2_starter/
+   63  ls
+   64  cd lab2_starter/
+   65  ls
+   66  ls -a
+   67  mv .git .not-git
+   68  ls
+   69  ls -a
+   70  cd ..
+   71  git status
+   72  git add lab2_starter/
+   73  git commit -m "Initial commit"
+   74  git remote add origin git@github.com:MarkLindblad/ee106a-labs.git
+   75  git push origin master
+   76  cd lab2_starter/
+   77  ls
+   78  rm -rf .not-git/
+   79  cd ..
+   80  git status
+   81  git add lab2_starter/
+   82  git status
+   83  cd lab2_starter/
+   84  grep -r lab2_starter .
+   85  ls
+   86  cd lab2
+   87  ls
+   88  cd devel/
+   89  ls
+   90  cd ..
+   91  ls
+   92  cd src/
+   93  ls
+   94  vim CMakeLists.txt 
+   95  cd ../..
+   96  ls -la
+   97  cd lab2
+   98  ls -la
+   99  ls build/
+  100  ls devel/
+  101  cd devel/
+  102  grep -r lab2_starter .
+  103  ls
+  104  grep lab2_starter *
+  105  vim setup.sh 
+  106  ls -l setup.sh 
+  107  %
+  108  git ls
+  109  git list
+  110  git --help
+  111  git submodule list
+  112  git submodule summary
+  113  cd ..
+  114  git submodule summary
+  115  cd ..
+  116  git submodule summary
+  117  git log -3
+  118  cd ~/Desktop/
+  119  history | grep init
+  120  history | grep git
+  121  git clone git@github.com:MarkLindblad/ee106a-labs.git
+  122  ls
+  123  cd ee106a-labs/
+  124  ls
+  125  cd lab2_starter/
+  126  ls
+  127  cd ..
+  128  cd lab1/
+  129  ls
+  130  cd ..
+  131  cd ..
+  132  cd ee106a-labs/
+  133  ls
+  134  ls -la
+  135  cd lab2_starter/
+  136  ls -la
+  137  git status
+  138  cd ~/ros_workspaces/
+  139  ls -la
+  140  git status
+  141  mv lab2_starter/ lab2_starter_old
+  142  ls
+  143  ls -la
+  144  git status
+  145  cp -r lab2_starter_old lab2_starter
+  146  ls
+  147  git status
+  148  rm -rf lab2_starter
+  149  ls
+  150  git status
+  151  git rm lab2_starter
+  152  git status
+  153  git commit -m "removed lab2_starter"
+  154  git push
+  155  git push --set-upstream origin master
+  156  ls
+  157  cd lab2_starter_old/
+  158  ls
+  159  cd lab2/
+  160  ls
+  161  cd ../..
+  162  ls
+  163  git status
+  164  mv lab2_starter_old lab2_starter
+  165  git status
+  166  cd lab2_starter/
+  167  ls -la
+  168  cd ..
+  169  git add lab2_starter/
+  170  git status
+  171  git commit -m "added lab2_starter"
+  172  git push
+  173  history
+  174  pkill -u ee106a-aft
+  175  vim ~/.bashrc
+  176  vim ~/.bashrc
+  177  vim ~/.bashrc
+  178  source ~/.bashrc
+  179  ping green
+  180  ping green
+  181  top
+  182  ssh turtlebot@green.local
+  183  roslaunch turtlebot_rviz_launchers view_navigation.launch
+  184  roslaunch turtlebot_rviz_launchers view_navigation.launch
+  185  roslaunch turtlebot_rviz_launchers view_navigation.launch
+  186  roslaunch turtlebot_rviz_launchers view_navigation.launch
+  187  roslaunch turtlebot_rviz_launchers view_navigation.launch
+  188  roslaunch turtlebot_rviz_launchers view_navigation.launch
+  189  roslaunch turtlebot_rviz_launchers view_navigation.launch
+  190  ssh turtlebot@green.local
+  191  ssh turtlebot@green.local
+  192  pkill -u ee106a-aft
+  193  ssh turtlebot@green.local
+  194  ssh turtlebot@green.local
+  195  ssh turtlebot@green.local
+  196  ssh turtlebot@green.local
+  197  top
+  198  ping green.local
+  199  ping green.local
+  200  ssh turtlebot@green.local
+  201  ping green.local
+  202  vim ~/.bashrc
+  203  vim ~/.bashrc
+  204  ping green.local
+  205  ssh turtlebot@green.local
+  206  ssh turtlebot@green.local
+  207  roslaunch turtlebot_rviz_launchers view_navigation.launch
+  208  ping yellow.local
+  209  cd ros_workspaces/
+  210  ls
+  211  git push
+  212  cd ls
+  213  ls
+  214  cd ros_workspaces/
+  215  cd lab4
+  216  ls
+  217  cd src
+  218  ls
+  219  history
+  220  history | grep run_cam
+  221  cd ../..
+  222  ls
+  223  cd lab2_starter/
+  224  ls
+  225  cd lab2/
+  226  ls
+  227  cd src/
+  228  ls
+  229  vim lab2_turtlesim/src/turtle_controller.py 
+  230  grep -r Twist .
+  231  vim turtle_patrol/src/patrol_server.py 
+  232  rospack find tf2_ros
+  233  roscd tf2_ros
+  234  ls
+  235  vim package.xml 
+  236  cd ~/ros_workspaces/
+  237  ls
+  238  cd lab4
+  239  ls
+  240  cd src/
+  241  ls
+  242  cd lab4_cam/
+  243  ls
+  244  cd launch/
+  245  ls
+  246  vim run_cam.launch 
+  247  cd ..
+  248  ls
+  249  cd sr
+  250  ls
+  251  cd ..
+  252  ls
+  253  vim turtlebot_control.py 
+  254  roslog info 
+  255  %
+  256  rosinfo log
+  257  %
+  258  echo catkin_create_pkg turtlebot_control
+  259  cd ..
+  260  ls
+  261  cd src
+  262  echo catkin_create_pkg turtlebot_control
+  263  catkin_create_pkg turtlebot_control
+  264  ls
+  265  cd turtlebot_control
+  266  ls
+  267  jobs
+  268  %
+  269  ls
+  270  cd ..
+  271  ls
+  272  %
+  273  mv turtlebot_control.py turtlebot_control
+  274  cd turtlebot_control/
+  275  ls
+  276  vim turtlebot_control.py 
+  277  vim turtlebot_control.py 
+  278  rosrun turtlebot_control turtlebot_control.py base_link ar_marker_10
+  279  history | grep base_link
+  280  cd ..
+  281  rosrun turtlebot_control turtlebot_control.py base_link ar_marker_10
+  282  ls
+  283  catkin_make
+  284  cd ..
+  285  catkin_make
+  286  rosrun turtlebot_control turtlebot_control.py base_link ar_marker_10
+  287  source devel/setup.bash 
+  288  catkin_make
+  289  rosrun turtlebot_control turtlebot_control.py base_link ar_marker_10
+  290  cd src/turtlebot_control/
+  291  ls -la
+  292  chmod +x turtlebot_control.py 
+  293  rosrun turtlebot_control turtlebot_control.py base_link ar_marker_10
+  294  jovas
+  295  jobs
+  296  ls
+  297  vim turtlebot_control.py 
+  298  rosrun turtlebot_control turtlebot_control.py base_link ar_marker_10
+  299  jobs
+  300  vim turtlebot_control.py 
+  301  %
+  302  %
+  303  catkin_make
+  304  cd ..
+  305  catkin_make
+  306  cd ..
+  307  catkin_make
+  308  rosrun turtlebot_control turtlebot_control.py base_link ar_marker_10
+  309  %
+  310  catkin_make
+  311  rosrun turtlebot_control turtlebot_control.py base_link ar_marker_10
+  312  %
+  313  ls
+  314  git status
+  315  cd ~/ros_workspaces/
+  316  ls
+  317  git status
+  318  git add lab4
+  319  git push
+  320  git status
+  321  git commit -m "Checkpoints 1 & 2 of Lab 4"
+  322  git push
+  323  ls
+  324  cd lab4
+  325  ls
+  326  cd src
+  327  ls
+  328  cd lab4_cam/
+  329  cd ..
+  330  jobs
+  331  %
+  332  cd ..
+  333  catkin_make
+  334  rosrun turtlebot_control turtlebot_control.py base_link ar_marker_10
+  335  ls
+  336  cd src
+  337  ls
+  338  cd turtlebot_control/
+  339  ls
+  340  vim turtlebot_control.py 
+  341  rosrun turtlebot_control turtlebot_control.py base_link ar_marker_10
+  342  %
+  343  %
+  344  rosrun turtlebot_control turtlebot_control.py base_link ar_marker_10
+  345  %
+  346  %
+  347  rosrun turtlebot_control turtlebot_control.py base_link ar_marker_10
+  348  %
+  349  rosrun turtlebot_control turtlebot_control.py base_link ar_marker_10
+  350  %
+  351  rosrun turtlebot_control turtlebot_control.py base_link ar_marker_10
+  352  %
+  353  git status
+  354  git add .
+  355  git commit -m "Progress on lab4"
+  356  git push
+  357  git status
+  358  pkill -u ee106a-aft
+  359  ls
+  360  cd ..
+  361  ls
+  362  roscd tf
+  363  ls
+  364  cd srv
+  365  ls
+  366  cd ..
+  367  ls
+  368  cd msg
+  369  ls
+  370  vim pack
+  371  cd ..
+  372  vim package.xml 
+  373  ls
+  374  cd srv
+  375  ls
+  376  cd ..
+  377  ls
+  378  rospack find static_transform_publisher
+  379  rosrun tf static_transform_publisher
+  380  cat package.xml 
+  381  rosrun tf static_transform_publisher
+  382  rosrun tf static_transform_publisher 
+  383  rosrun tf static_transform_publisher 0.014 0 -0.397 1.571 0 0 ar_marker_8 base_link 100
+  384  ping green.local
+  385  ping green.local
+  386  vim ~/.bashrc
+  387  source ~/.bashrc
+  388  ping yellow.local
+  389  ssh turtlebot@yellow.local
+  390  rosrun rviz rviz
+  391  m/image_raw
+  392  rostopic echo -c --noarr /usb_cam/image_raw
+  393  rostopic echo /usb_cam/camera_info
+  394  rosrun image_view image_view image:=/usb_cam/image_raw
+  395  ssh turtlebot@yellow.local
+  396  ssh turtlebot@blue.local
+  397  cd ros_workspaces/
+  398  lsw
+  399  ls
+  400  cd lab
+  401  cd lab4
+  402  ls
+  403  cd src
+  404  ls
+  405  cd turtlebot_control/
+  406  ls
+  407  ping blue.local
+  408  ssh turtlebot@blue.local
+  409  top
+  410  top | grep rviz
+  411  cd ros_workspaces/
+  412  ls
+  413  git status
+  414  gi diff lab4/src/turtlebot_control/turtlebot_control.py 
+  415  git diff lab4/src/turtlebot_control/turtlebot_control.py 
+  416  ls
+  417  rosrun tf static_transform_publisher 0 0 0 0 0 0 base_link camera_depth_frame 100
+  418  roslaunch lab4_cam run_cam.launch
+  419  ls
+  420  cd ..
+  421  ls
+  422  cd ..
+  423  ls
+  424  source devel/setup.bash 
+  425  roslaunch lab4_cam run_cam.launch
+  426  roslaunch lab4_cam run_cam.launch
+  427  roslaunch lab4_cam run_cam.launch
+  428  roslaunch turtlebot_rviz_launchers view_navigation.launch
+  429  rosrun rviz rviz
+  430  rosrun rviz rviz
+  431  rosrun rviz rviz
+  432  rosrun rviz rviz
+  433  rosrun rviz rviz
+  434  rosrun rviz rviz
+  435  rosrun rviz rviz
+  436  roslaunch lab4_cam ar_track.launch
+  437  source devel/setup.bash 
+  438  roslaunch lab4_cam ar_track.launch
+  439  roslaunch lab4_cam ar_track.launch
+  440  roslaunch lab4_cam ar_track.launch
+  441  roslaunch lab4_cam ar_track.launch
+  442  roslaunch lab4_cam ar_track.launch
+  443  roslaunch lab4_cam ar_track.launch
+  444  rosrun tf static_transform_publisher 0.014 0 -0.397 1.571 0 0 
+  445  rosrun tf static_transform_publisher 0.014 0 -0.397 1.571 0 0 ar_marker_6 base_link
+  446  rosrun tf static_transform_publisher 0.014 0 -0.397 1.571 0 0 ar_marker_6 base_link 100
+  447  rosrun tf static_transform_publisher 0.014 0 -0.397 1.571 0 0 ar_marker_6 base_link 100
+  448  rosrun tf static_transform_publisher 0.014 0 -0.397 1.571 0 0 ar_marker_6 base_link 100
+  449  rosrun tf static_transform_publisher 0.014 0 -0.397 1.571 0 0 ar_marker_6 base_link 100
+  450  history | grep rqt
+  451  rosrun rqt_graph rqt_graph
+  452  rosrun rqt_graph rqt_graph
+  453  rosrun rqt_graph rqt_graph
+  454  rosrun rqt_graph rqt_graph
+  455  rosrun rqt_graph rqt_graph
+  456  rosrun image_view image_view image:=/usb_cam/image_raw
+  457  rosrun image_view image_view image:=/usb_cam/image_raw
+  458  rosrun image_view image_view image:=/usb_cam/image_raw
+  459  rosrun image_view image_view image:=/usb_cam/image_raw
+  460  cd ros_workspaces/
+  461  ls
+  462  cd lab4/
+  463  ls
+  464  cd src
+  465  ls
+  466  cd turtlebot_control/
+  467  ls
+  468  vim turtlebot_control.py 
+  469  emacs -nw turtlebot_control.py 
+  470  pkill -u ee106a-aft
+  471  echo ~/.bashrc
+  472  cat ~/.bashrc
+  473  rosconsole
+  474  rosconsole set DEBUG
+  475  ping blue.local
+  476  ssh turtlebot@blue.local
+  477  rosrun rqt_graph rqt_graph 
+  478  rosrun lab4_cam run_cam.launch
+  479  ls
+  480  cd ros_workspaces/
+  481  ls
+  482  cd lab4
+  483  source devel/setup.bash 
+  484  rosrun lab4_cam run_cam.launch
+  485  cd src
+  486  cd lab4_cam/
+  487  cd launch/
+  488  ls -l run_cam.launch 
+  489  rosrun lab4_cam run_cam.launch
+  490  history | tail -10
+  491  roslaunch lab4_cam run_cam.launch
+  492  cd ro
+  493  cd
+  494  cd ros_workspaces/
+  495  cd lab4
+  496  source devel/setup.bash 
+  497  roslaunch lab4_cam ar_track.launch
+  498  roslaunch lab4_cam ar_track.launch
+  499  rosrun rviz rviz
+  500  pkill -u ee106a-aft
+  501  cd ros_workspaces/lab4
+  502  ls
+  503  cd src
+  504  ls
+  505  cd turtlebot_control/
+  506  ls
+  507  emacs -nw turtlebot_control.py 
+  508  %
+  509  %
+  510  rostopic list 
+  511  rostopic list -p
+  512  rostopic list | grep cmd_vel
+  513  %
+  514  git status
+  515  %
+  516  git add turtlebot_control.py 
+  517  git commit -m "Working version"
+  518  history
+  519  history > ~/ros_workspaces/how_to_find_cmd_vel_topic

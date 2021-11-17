@@ -1,0 +1,12 @@
+7 angles:
+0.0, -0.1, 0.0, 0.5, 0.0, 1.17, 3.14
+
+first angle is base rotation, length position
+second, fourth, sixth angles are lengthwise rotation axes
+decreasing second angle moves up
+increasing fourth angle moves down
+decreasing sixth angle moves up
+sixth angle default is pi/2 (1.57)
+seventh angle is end effector rotation, set to pi/2 is fine
+
+third, fifth angles are unneeded (always leave at 0.0)

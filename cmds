@@ -1,0 +1,2 @@
+ssh turtlebot@blue.local
+roslaunch turtlebot_bringup minimal.launch

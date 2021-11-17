@@ -1,0 +1,8 @@
+prefix=/home/cc/ee106a/fl21/class/ee106a-aft/ros_workspaces/lab1/devel
+
+Name: bar
+Description: Description of bar
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

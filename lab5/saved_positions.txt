@@ -1,0 +1,44 @@
+At time 1633552266.881
+- Translation: [0.769, 0.187, -0.148]
+- Rotation: in Quaternion [0.709, 0.703, 0.034, -0.048]
+            in RPY (radian) [-3.121, -0.116, 1.561]
+            in RPY (degree) [-178.826, -6.619, 89.417]
+
+
+nslation: [0.828, 0.443, -0.154]
+- Rotation: in Quaternion [0.689, 0.724, -0.007, -0.018]
+            in RPY (radian) [-3.106, -0.017, 1.620]
+            in RPY (degree) [-177.976, -0.962, 92.845]
+
+
+
+
+
+
+
+Above target:
+t time 1633553952.681
+- Translation: [0.758, 0.146, -0.053]
+- Rotation: in Quaternion [0.020, 1.000, -0.002, 0.011]
+            in RPY (radian) [-3.138, 0.023, 3.102]
+            in RPY (degree) [-179.772, 1.301, 177.747]
+
+
+On Target:
+
+At time 1633553994.631
+- Translation: [0.747, 0.159, -0.161]
+- Rotation: in Quaternion [-0.003, 1.000, 0.022, -0.002]
+            in RPY (radian) [3.098, -0.004, -3.135]
+            in RPY (degree) [177.516, -0.230, -179.608]
+
+
+Drop location:
+At time 1633554107.140
+- Translation: [0.779, 0.429, -0.108]
+- Rotation: in Quaternion [0.005, 1.000, 0.027, -0.007]
+            in RPY (radian) [3.087, -0.013, 3.132]
+            in RPY (degree) [176.861, -0.768, 179.455]
+
+
+
