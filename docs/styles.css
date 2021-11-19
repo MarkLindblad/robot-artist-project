@@ -1,0 +1,39 @@
+body {
+	background-color: DeepSkyBlue;
+	font-family: Arial;
+}
+
+.page {
+	margin: auto;
+	width: 50em;
+}
+
+.title {
+	font-family: Arial Black;
+}
+
+.navigation {
+	border-radius: 15px 50px 30px;
+	background: blue;
+	color: white;
+	padding: 10px;
+	text-decoration: none;
+}
+
+.navigation:hover {
+	background: white;
+	color: blue;
+}
+
+.namecard {
+	border-radius: 15px 50px 30px;
+	background: white;
+	margin: 10px;
+}
+
+.namecard-profile-photo {
+	border-radius: 50%;
+	padding: 10px;
+	background: white;
+	height: 5em;
+}
