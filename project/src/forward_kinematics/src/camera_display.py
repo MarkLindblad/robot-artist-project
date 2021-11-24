@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import argparse
 import numpy as np
+import sys
 import cv2
 from cv_bridge import CvBridge, CvBridgeError
 import rospy
@@ -29,31 +30,38 @@ def show_image_callback(img_data, (edge_detection, window_name)):
 	# 	# in function cv2.Canny if needed
 	# 	get_edge = cv2.Canny(blurred, 10, 100)
 	# 	cv_image = np.hstack([get_edge])
-	# edge_str = "(Edge Detection)" if edge_detection else ''
+	edge_str = "(Edge Detection)" if edge_detection else ''
 
 	# gray = cv2.cvtColor(cv_image, cv2.COLOR_BGR2GRAY)
 
-	# dtype, n_channels = bridge.encoding_as_cvtype2('8UC3')
-	# im = np.ndarray(shape=(480, 640, n_channels), dtype=dtype)
-	# cv2.imwrite("this_was_a_message_briefly.png", im)
-	filename = 'savedImage.jpg'
-	cv2.imwrite(filename, cv_image)
-	img = np.array(cv2.imread(filename, 0))
-
-
-	print(np.min(img), np.max(img))
-
-	plt.imshow(img, cmap = 'gray')
-	plt.show()
-
-	dots_x, dots_y, size = dots.grey_dither(img, angle = 30, size = 100)
-	plt.plot(dots_x, dots_y, 'ko')
+	
 	plt.show()
 	cv_win_name = ' '.join([window_name, edge_str])
 	cv2.namedWindow(cv_win_name, 0)
 	# refresh the image on the screen
 	cv2.imshow(cv_win_name, cv_image)
-	cv2.waitKey(10)
+	#cv2.waitKey(10)
+
+	key_pressed = cv2.waitKey(33)
+
+	if key_pressed == ord('p'):
+		# dtype, n_channels = bridge.encoding_as_cvtype2('8UC3')
+		# im = np.ndarray(shape=(480, 640, n_channels), dtype=dtype)
+		# cv2.imwrite("this_was_a_message_briefly.png", im)
+		print("Saving Image")
+		filename = 'savedImage.jpg'
+		cv2.imwrite(filename, cv_image)
+		# img = np.array(cv2.imread(filename, 0))
+
+
+		# print(np.min(img), np.max(img))
+		# img = dots.contrast(img, 50, 200)
+
+		# plt.imshow(img, cmap = 'gray')
+		# plt.show()
+
+		# dots_x, dots_y, size = dots.grey_dither(img, angle = 30, size = 100)
+		# plt.plot(dots_x, dots_y, 'ko')
 
 def main():
 	"""Camera Display Example
