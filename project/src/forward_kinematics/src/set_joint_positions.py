@@ -30,8 +30,11 @@
 """
 Baxter RSDK Joint Position Example: keyboard
 """
+from __future__ import division, print_function
 import argparse
 import time
+import random
+from coord_transform import convert_image_to_robot_coords, convert_robot_coords_to_joint_angles
 
 import rospy
 
@@ -111,22 +114,40 @@ def map_keyboard():
                                        key=lambda x: x[1][2]):
                     print("  %s: %s" % (key, val[2]))
 
+def angles_to_dict(rj, angles):
+    return {rj[i]: angles[i] for i in range(len(rj))}
+
 def set_joints():
     right = intera_interface.Limb('right')
-    right.set_joint_position_speed(0.03)
+    right.set_joint_position_speed(0.1)
+
+    rj = right.joint_names()
+    image_coords = [((i % 4) * 50 - 100, (i // 4) * 50 - 100) for i in range(16)]
+    random.shuffle(image_coords)
+    for ic in image_coords:
+        rc = convert_image_to_robot_coords(*ic)
+        right.move_to_joint_positions(angles_to_dict(rj, convert_robot_coords_to_joint_angles(rc[0], rc[1], rc[2] + 50)))
+        right.move_to_joint_positions(angles_to_dict(rj, convert_robot_coords_to_joint_angles(rc[0], rc[1], rc[2] - 22)))
+        time.sleep(1)
+        print(right.endpoint_pose()['position'])
+        right.move_to_joint_positions(angles_to_dict(rj, convert_robot_coords_to_joint_angles(rc[0], rc[1], rc[2] + 50)))
+    """
     rj = right.joint_names()
     while True:
         current_positions = [right.joint_angle(rj[i]) for i in range(len(rj))]
-        print("Current positions: ", current_positions)
+        # print("Start positions: ", current_positions)
         angles = raw_input("Enter 7 joint angles: ")
         angles = angles.strip().split(", ")
         angles = [float(angle) for angle in angles]
         while max([abs(angles[i] - current_positions[i]) for i in [0, 1, 3, 5, 6]]) > 0.005:
-            print("Current positions: ", current_positions)
-            print("Desired positions: ", angles)
+            # print("Current positions: ", current_positions)
+            # print("Desired positions: ", angles)
             right.set_joint_positions({rj[i]: angles[i] for i in range(len(rj))})
             time.sleep(0.01)
             current_positions = [right.joint_angle(rj[i]) for i in range(len(rj))]
+        # print("End positions: ", current_positions)
+        print("End pose: ", right.endpoint_pose())
+    """
 
 
 def main():
