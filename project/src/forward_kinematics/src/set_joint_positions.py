@@ -34,7 +34,13 @@ from __future__ import division, print_function
 import argparse
 import time
 import random
+
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+
 from coord_transform import convert_image_to_robot_coords, convert_robot_coords_to_joint_angles
+import dots
 
 import rospy
 
@@ -44,76 +50,6 @@ import intera_external_devices
 from intera_interface import CHECK_VERSION
 
 
-def map_keyboard():
-    right = intera_interface.Limb('right')
-    grip_right = intera_interface.Gripper('right', CHECK_VERSION)
-    rj = right.joint_names()
-
-    def set_j(limb, joint_name, delta):
-        current_position = limb.joint_angle(joint_name)
-        joint_command = {joint_name: current_position + delta}
-        limb.set_joint_positions(joint_command)
-
-    bindings = {
-    #   key: (function, args, description)
-        '9': (set_j, [left, lj[0], 0.1], "left_s0 increase"),
-        '6': (set_j, [left, lj[0], -0.1], "left_s0 decrease"),
-        '8': (set_j, [left, lj[1], 0.1], "left_s1 increase"),
-        '7': (set_j, [left, lj[1], -0.1], "left_s1 decrease"),
-        'o': (set_j, [left, lj[2], 0.1], "left_e0 increase"),
-        'y': (set_j, [left, lj[2], -0.1], "left_e0 decrease"),
-        'i': (set_j, [left, lj[3], 0.1], "left_e1 increase"),
-        'u': (set_j, [left, lj[3], -0.1], "left_e1 decrease"),
-        'l': (set_j, [left, lj[4], 0.1], "left_w0 increase"),
-        'h': (set_j, [left, lj[4], -0.1], "left_w0 decrease"),
-        'k': (set_j, [left, lj[5], 0.1], "left_w1 increase"),
-        'j': (set_j, [left, lj[5], -0.1], "left_w1 decrease"),
-        '.': (set_j, [left, lj[6], 0.1], "left_w2 increase"),
-        'n': (set_j, [left, lj[6], -0.1], "left_w2 decrease"),
-        ',': (grip_left.close, [], "left: gripper close"),
-        'm': (grip_left.open, [], "left: gripper open"),
-        '/': (grip_left.calibrate, [], "left: gripper calibrate"),
-
-        '4': (set_j, [right, rj[0], 0.1], "right_s0 increase"),
-        '1': (set_j, [right, rj[0], -0.1], "right_s0 decrease"),
-        '3': (set_j, [right, rj[1], 0.1], "right_s1 increase"),
-        '2': (set_j, [right, rj[1], -0.1], "right_s1 decrease"),
-        'r': (set_j, [right, rj[2], 0.1], "right_e0 increase"),
-        'q': (set_j, [right, rj[2], -0.1], "right_e0 decrease"),
-        'e': (set_j, [right, rj[3], 0.1], "right_e1 increase"),
-        'w': (set_j, [right, rj[3], -0.1], "right_e1 decrease"),
-        'f': (set_j, [right, rj[4], 0.1], "right_w0 increase"),
-        'a': (set_j, [right, rj[4], -0.1], "right_w0 decrease"),
-        'd': (set_j, [right, rj[5], 0.1], "right_w1 increase"),
-        's': (set_j, [right, rj[5], -0.1], "right_w1 decrease"),
-        'v': (set_j, [right, rj[6], 0.1], "right_w2 increase"),
-        'z': (set_j, [right, rj[6], -0.1], "right_w2 decrease"),
-        'c': (grip_right.close, [], "right: gripper close"),
-        'x': (grip_right.open, [], "right: gripper open"),
-        'b': (grip_right.calibrate, [], "right: gripper calibrate"),
-     }
-    done = False
-    print("Controlling joints. Press ? for help, Esc to quit.")
-    while not done and not rospy.is_shutdown():
-        c = intera_external_devices.getch()
-        if c:
-            #catch Esc or ctrl-c
-            if c in ['\x1b', '\x03']:
-                done = True
-                rospy.signal_shutdown("Example finished.")
-            elif c in bindings:
-                cmd = bindings[c]
-                #expand binding to something like "set_j(right, 's0', 0.1)"
-                cmd[0](*cmd[1])
-                print("command: %s" % (cmd[2],))
-            else:
-                print("key bindings: ")
-                print("  Esc: Quit")
-                print("  ?: Help")
-                for key, val in sorted(bindings.items(),
-                                       key=lambda x: x[1][2]):
-                    print("  %s: %s" % (key, val[2]))
-
 def angles_to_dict(rj, angles):
     return {rj[i]: angles[i] for i in range(len(rj))}
 
@@ -122,15 +58,44 @@ def set_joints():
     right.set_joint_position_speed(0.1)
 
     rj = right.joint_names()
-    image_coords = [((i % 4) * 50 - 100, (i // 4) * 50 - 100) for i in range(16)]
-    random.shuffle(image_coords)
-    for ic in image_coords:
+    # image_coords = [((i % 10) * -20, (i // 10) * 20) for i in range(100)]
+    # random.shuffle(image_coords)
+    
+    filename = 'sphere.jpg'
+    img = np.array(cv2.imread(filename, 0))
+    img = dots.contrast(img, 50, 200)
+
+    dots_x, dots_y, size = dots.grey_dither(img, angle = 30, size = 50)
+    # plt.plot(dots_x, dots_y, 'ko')
+    # plt.show()
+
+    filename = 'sonof.png'
+    img = np.array(cv2.imread(filename))
+    R = 255 -img[:, :, 2]
+    G = 255 -img[:, :, 1]
+    B = 255 -img[:, :, 0]
+
+    r_x, r_y, size = dots.grey_dither(R, angle = 30, size = 100)
+    g_x, g_y, size = dots.grey_dither(G, angle = 45, size = 100)
+    b_x, b_y, size = dots.grey_dither(B, angle = 60, size = 100)
+    plt.plot(g_x, g_y, 'g.', alpha = .5)
+    plt.plot(b_x, b_y, 'b.', alpha = .5)
+    plt.plot(r_x, r_y, 'r.', alpha = .5)
+    plt.show()
+    return
+    image_coords = [(2 * dots_x[i], 2 * dots_y[i]) for i in range(len(dots_x))]
+    # image_coords = [(-50, -50), (-50, 50), (50, 50), (50, -50), (-50, 50), (50, 50), (-50, -50)]
+    # image_coords = image_coords[:1]
+    
+    for i in range(len(image_coords)):
+        ic = image_coords[i]
+        print(i, ic)
         rc = convert_image_to_robot_coords(*ic)
-        right.move_to_joint_positions(angles_to_dict(rj, convert_robot_coords_to_joint_angles(rc[0], rc[1], rc[2] + 50)))
-        right.move_to_joint_positions(angles_to_dict(rj, convert_robot_coords_to_joint_angles(rc[0], rc[1], rc[2] - 22)))
-        time.sleep(1)
-        print(right.endpoint_pose()['position'])
-        right.move_to_joint_positions(angles_to_dict(rj, convert_robot_coords_to_joint_angles(rc[0], rc[1], rc[2] + 50)))
+        right.move_to_joint_positions(angles_to_dict(rj, convert_robot_coords_to_joint_angles(rc[0], rc[1], rc[2] - 30)))
+        time.sleep(0.2)
+        right.move_to_joint_positions(angles_to_dict(rj, convert_robot_coords_to_joint_angles(rc[0], rc[1], rc[2] - 50)), threshold=0.005)
+        time.sleep(0.3)
+        right.move_to_joint_positions(angles_to_dict(rj, convert_robot_coords_to_joint_angles(rc[0], rc[1], rc[2] - 30)))
     """
     rj = right.joint_names()
     while True:
