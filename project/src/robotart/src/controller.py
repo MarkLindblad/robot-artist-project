@@ -35,15 +35,15 @@ class Controller:
         rxs, rys, rz = self.convert_image_to_robot_coords(ixs, iys)
         rxe, rye, rz = self.convert_image_to_robot_coords(ixe, iye)
         dist = math.sqrt((rxs - rxe) ** 2 + (rys - rye) ** 2)
-        steps = (dist // 3) + 1
-        self.move_to_robot_coords(rxs, rys, rz)
+        steps = int(dist // 3) + 1
+        self.move_to_robot_coords(rxs, rys, rz - 30)
         rospy.sleep(0.2)
         for i in range(steps + 1):
             rx = rxs + (rxe - rxs) * (i / steps)
             ry = rys + (rye - rys) * (i / steps)
-            self.move_to_robot_coords(rx, ry, rz - 20)
+            self.move_to_robot_coords(rx, ry, rz - 50)
         rospy.sleep(0.3)
-        self.move_to_robot_coords(rxe, rye, rz)
+        self.move_to_robot_coords(rxe, rye, rz - 30)
 
     @staticmethod
     def convert_image_to_robot_coords(px, py, x_ofs=600, y_ofs=0, z_ofs=150):

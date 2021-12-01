@@ -11,12 +11,11 @@ import intera_external_devices
 
 from intera_interface import CHECK_VERSION
 
-def draw_points(points):
+def draw_lines(lines):
     controller = Controller()
-    for i in range(len(points)):
-        ix, iy = points[i]
-        print(i, ix, iy)
-        controller.draw_image_point(ix, iy)
+    for i in range(len(lines)):
+        print(i, lines[i])
+        controller.draw_image_line(lines[i][0] * 100 - 50, lines[i][2] * 100 + 150, lines[i][1] * 100 - 50, lines[i][3] * 100 + 150)
 
 def main():
     print("Initializing node... ")
@@ -35,7 +34,15 @@ def main():
     print("Enabling robot... ")
     rs.enable()
 
-    draw_points([(100, 100), (100, -100), (-100, -100), (-100, 100), (100, 100)])
+    lines = []
+    with open('ball2_lines.txt') as f:
+        for line in f:
+            line = line.strip()
+            line = line[1:-1]
+            line = line.split()
+            line = [float(x) for x in line]
+            lines.append(line)
+    draw_lines(lines)
     print("Done.")
 
 
