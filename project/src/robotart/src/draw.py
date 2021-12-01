@@ -11,10 +11,10 @@ import intera_external_devices
 
 from intera_interface import CHECK_VERSION
 
-def move_along_path(points):
+def draw_points(points):
     controller = Controller()
     for i in range(len(points)):
-        ix, iy = image_coords[i]
+        ix, iy = points[i]
         print(i, ix, iy)
         controller.draw_image_point(ix, iy)
 
@@ -35,7 +35,7 @@ def main():
     print("Enabling robot... ")
     rs.enable()
 
-    draw_points(points)
+    draw_points([(100, 100), (100, -100), (-100, -100), (-100, 100), (100, 100)])
     print("Done.")
 
 
