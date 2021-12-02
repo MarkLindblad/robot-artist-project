@@ -43,15 +43,19 @@ from coord_transform import convert_image_to_robot_coords, convert_robot_coords_
 import dots
 
 import rospy
+import tf2_ros
 
 import intera_interface
 import intera_external_devices
 
 from intera_interface import CHECK_VERSION
 
-
 def angles_to_dict(rj, angles):
     return {rj[i]: angles[i] for i in range(len(rj))}
+
+top_left_paper_tag = "ar_marker_3"
+#bottom_right_paper_tag = "ar_marker_4"
+camera_frame = "reference/right_hand_camera"
 
 def set_joints():
     right = intera_interface.Limb('right')
@@ -60,6 +64,30 @@ def set_joints():
     rj = right.joint_names()
     # image_coords = [((i % 10) * -20, (i // 10) * 20) for i in range(100)]
     # random.shuffle(image_coords)
+
+    tfBuffer = tf2_ros.Buffer()
+    tfListener = tf2_ros.TransformListener(tfBuffer)
+    top_left_to_camera = None
+    right.move_to_joint_positions(angles_to_dict(rj, [0, 0, 0, 0, 0, 0, 0]))
+    time.sleep(1)
+    while top_left_to_camera is None:
+        try:
+            top_left_to_camera = tfBuffer.lookup_transform(top_left_paper_tag,camera_frame, rospy.Time())
+        except :
+            pass
+    print(top_left_to_camera)
+
+    t = top_left_to_camera
+    t_x = t.transform.translation.x * 100 + 650
+    t_y = t.transform.translation.y * 100
+    t_z = 150 #t.transform.translation.z * 100
+    
+    print(t_x, t_y, t_z)
+    #print(convert_robot_coords_to_joint_angles(t.transform.translation.x, t.transform.translation.y, t.transform.translation.z))
+    raw_input("enter to confirm coords")
+    
+    right.move_to_joint_positions(angles_to_dict(rj, convert_robot_coords_to_joint_angles(t_x, t_y, t_z)))
+    return
     
     filename = 'sphere.jpg'
     img = np.array(cv2.imread(filename, 0))
@@ -69,6 +97,7 @@ def set_joints():
     # plt.plot(dots_x, dots_y, 'ko')
     # plt.show()
 
+    """
     filename = 'sonof.png'
     img = np.array(cv2.imread(filename))
     R = 255 -img[:, :, 2]
@@ -83,9 +112,13 @@ def set_joints():
     plt.plot(r_x, r_y, 'r.', alpha = .5)
     plt.show()
     return
+    """
+    
     image_coords = [(2 * dots_x[i], 2 * dots_y[i]) for i in range(len(dots_x))]
     # image_coords = [(-50, -50), (-50, 50), (50, 50), (50, -50), (-50, 50), (50, 50), (-50, -50)]
     # image_coords = image_coords[:1]
+    
+    #top_left_tobottom_right = tfBuffer.lookup_transform(top_left_paper_tag, bottom_right_paper_tag, rospy.Time())
     
     for i in range(len(image_coords)):
         ic = image_coords[i]
