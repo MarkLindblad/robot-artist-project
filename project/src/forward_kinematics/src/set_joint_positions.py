@@ -54,8 +54,15 @@ def angles_to_dict(rj, angles):
     return {rj[i]: angles[i] for i in range(len(rj))}
 
 top_left_paper_tag = "ar_marker_3"
+# You will need to update the name and id of the ar tag if you change
+# which one you are using.
+
 #bottom_right_paper_tag = "ar_marker_4"
+# For the future, when we use the distance between the ar markers to
+# get the size of the paper from the ar tags themselves.
+
 camera_frame = "reference/right_hand_camera"
+# This should not change
 
 def set_joints():
     right = intera_interface.Limb('right')
@@ -66,11 +73,28 @@ def set_joints():
     # random.shuffle(image_coords)
 
     tfBuffer = tf2_ros.Buffer()
+    # The tf package creates and keeps track of recent transformations.
+    # This is the buffer where they are stored.
+
     tfListener = tf2_ros.TransformListener(tfBuffer)
+    # The tfListener variable is not used, but we need this line to create
+    # and keep the TransformListener
+    
     top_left_to_camera = None
+    # tfListener does not always work the first 20-30 times we try to do
+    # a tfBuffer lookup, so we need to repetitively try to get the
+    # top_left_to_camera transformation.
+    
     right.move_to_joint_positions(angles_to_dict(rj, [0, 0, 0, 0, 0, 0, 0]))
+    # Puts the arm in the zero-angle configuration so that the camera is
+    # pointing a the ar tag near the paper
+    
     time.sleep(1)
+    # Wait for the robot to get to the zero-angle configuration
+
     while top_left_to_camera is None:
+    # Since it takes 20-30 times to get sucessfully tfBuffer lookup, this
+    # loop is necessary
         try:
             top_left_to_camera = tfBuffer.lookup_transform(top_left_paper_tag,camera_frame, rospy.Time())
         except :
@@ -78,16 +102,24 @@ def set_joints():
     print(top_left_to_camera)
 
     t = top_left_to_camera
+    # TODO: Calculate the transformation from the robot base to the ar tag
+    # using the transformation from the end effector camera to the ar tag
+    # and the transformation from the base to the end effector given the
+    # joint angles
+    
     t_x = t.transform.translation.x * 100 + 650
     t_y = t.transform.translation.y * 100
     t_z = 150 #t.transform.translation.z * 100
     
     print(t_x, t_y, t_z)
-    #print(convert_robot_coords_to_joint_angles(t.transform.translation.x, t.transform.translation.y, t.transform.translation.z))
+
     raw_input("enter to confirm coords")
+    # To make sure that the desired robot configuration is not  unreasonable
+    # before moving there.  Just press enter.
     
     right.move_to_joint_positions(angles_to_dict(rj, convert_robot_coords_to_joint_angles(t_x, t_y, t_z)))
     return
+    # I was having problems with the code below, so I exit prematurely
     
     filename = 'sphere.jpg'
     img = np.array(cv2.imread(filename, 0))
