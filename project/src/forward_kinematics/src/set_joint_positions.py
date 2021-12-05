@@ -42,8 +42,11 @@ import matplotlib.pyplot as plt
 from coord_transform import convert_image_to_robot_coords, convert_robot_coords_to_joint_angles
 import dots
 
+import tf
 import rospy
 import tf2_ros
+from moveit_msgs.srv import GetPositionIK, GetPositionIKRequest, GetPositionIKResponse
+from moveit_commander import MoveGroupCommander
 
 import intera_interface
 import intera_external_devices
@@ -107,17 +110,44 @@ def set_joints():
     # and the transformation from the base to the end effector given the
     # joint angles
     
-    t_x = t.transform.translation.x * 100 + 650
-    t_y = t.transform.translation.y * 100
-    t_z = 150 #t.transform.translation.z * 100
+    #t_x = t.transform.translation.x * 100 + 650
+    #t_y = t.transform.translation.y * 100
+    #t_z = 150 #t.transform.translation.z * 100
+
+    t_x = t.transform.translation.x 
+    t_y = t.transform.translation.y
+    t_z = t.transform.translation.z
     
     print(t_x, t_y, t_z)
 
+    print("PRINTING ROTATION")
+    print(t)
+    print("PRINTING TRANSFORM FROM BASE")
+    tfBuffer = tf2_ros.Buffer()
+    tfListener = tf2_ros.TransformListener(tfBuffer)
+    base_to_ar_tag = None
+    while base_to_ar_tag is None:
+    # Since it takes 20-30 times to get sucessfully tfBuffer lookup, this
+    # loop is necessary
+        try:
+            base_to_ar_tag = tfBuffer.lookup_transform("base",top_left_paper_tag, rospy.Time())
+        except :
+            pass
+    print(base_to_ar_tag)
     raw_input("enter to confirm coords")
     # To make sure that the desired robot configuration is not  unreasonable
     # before moving there.  Just press enter.
     
-    right.move_to_joint_positions(angles_to_dict(rj, convert_robot_coords_to_joint_angles(t_x, t_y, t_z)))
+    #right.move_to_joint_positions(angles_to_dict(rj, convert_robot_coords_to_joint_angles(t_x, t_y, t_z)))
+
+    # ATTEMPT TRYING INVERSE KINEMATICS
+    rospy.wait_for_service('compute_ik')
+    # Create the function used to call the service
+    print("HERE1")
+    compute_ik = rospy.ServiceProxy('compute_ik', GetPositionIK)
+    print("HERE2")
+    arm = 'right'
+    move_gripper(compute_ik, arm, t.transform.translation, t.transform.rotation)
     return
     # I was having problems with the code below, so I exit prematurely
     
@@ -178,7 +208,49 @@ def set_joints():
         # print("End positions: ", current_positions)
         print("End pose: ", right.endpoint_pose())
     """
+def move_gripper(compute_ik, arm, position, orientation):
+    request = GetPositionIKRequest()
+    request.ik_request.group_name = arm + "_arm"
 
+    link = arm + "_gripper"
+
+    request.ik_request.ik_link_name = link
+    request.ik_request.attempts = 20
+    request.ik_request.pose_stamped.header.frame_id = "base"
+    
+    # Set the desired orientation for the end effector HERE
+    request.ik_request.pose_stamped.pose.position.x = position.x
+    request.ik_request.pose_stamped.pose.position.y = position.y
+    request.ik_request.pose_stamped.pose.position.z = position.z        
+    request.ik_request.pose_stamped.pose.orientation.x = orientation.x
+    request.ik_request.pose_stamped.pose.orientation.y = orientation.y
+    request.ik_request.pose_stamped.pose.orientation.z = orientation.z
+    request.ik_request.pose_stamped.pose.orientation.w = orientation.w
+    request.ik_request.pose_stamped.pose.orientation.x = 0.0
+    request.ik_request.pose_stamped.pose.orientation.y = 1.0
+    request.ik_request.pose_stamped.pose.orientation.z = 0.0
+    request.ik_request.pose_stamped.pose.orientation.w = 0.0
+        
+    try:
+        # Send the request to the service
+        response = compute_ik(request)
+        
+        # Print the response HERE
+        print(response)
+        group = MoveGroupCommander(arm + "_arm")
+
+        # Setting position and orientation target
+        group.set_pose_target(request.ik_request.pose_stamped)
+
+        # TRY THIS
+        # Setting just the position without specifying the orientation
+        ###group.set_position_target(position)
+
+        # Plan IK and execute
+        group.go()
+            
+    except rospy.ServiceException, e:
+        print("Service call failed: %s")
 
 def main():
     """RSDK Joint Position Example: Keyboard Control
