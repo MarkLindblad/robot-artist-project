@@ -95,34 +95,30 @@ def set_joints():
     time.sleep(1)
     # Wait for the robot to get to the zero-angle configuration
 
-    while top_left_to_camera is None:
-    # Since it takes 20-30 times to get sucessfully tfBuffer lookup, this
-    # loop is necessary
-        try:
-            top_left_to_camera = tfBuffer.lookup_transform(top_left_paper_tag,camera_frame, rospy.Time())
-        except :
-            pass
-    print(top_left_to_camera)
+    # COMMENTED CAMERA TO TAG TRANSFORMATION FOR NOW 
+    # while top_left_to_camera is None:
+    # # Since it takes 20-30 times to get sucessfully tfBuffer lookup, this
+    # # loop is necessary
+    #     try:
+    #         top_left_to_camera = tfBuffer.lookup_transform(top_left_paper_tag,camera_frame, rospy.Time())
+    #     except :
+    #         pass
+    # print(top_left_to_camera)
 
-    t = top_left_to_camera
+    # t = top_left_to_camera
     # TODO: Calculate the transformation from the robot base to the ar tag
     # using the transformation from the end effector camera to the ar tag
     # and the transformation from the base to the end effector given the
     # joint angles
     
-    #t_x = t.transform.translation.x * 100 + 650
-    #t_y = t.transform.translation.y * 100
-    #t_z = 150 #t.transform.translation.z * 100
-
-    t_x = t.transform.translation.x 
-    t_y = t.transform.translation.y
-    t_z = t.transform.translation.z
+    # t_x = t.transform.translation.x * 100 + 650
+    # t_y = t.transform.translation.y * 100
+    # t_z = 150 #t.transform.translation.z * 100
     
-    print(t_x, t_y, t_z)
-
-    print("PRINTING ROTATION")
-    print(t)
-    print("PRINTING TRANSFORM FROM BASE")
+    # print(t_x, t_y, t_z)
+    # print("PRINTING ROTATION")
+    # print(t)
+    print("PRINTING TRANSFORM FROM BASE TO AR TAG")
     tfBuffer = tf2_ros.Buffer()
     tfListener = tf2_ros.TransformListener(tfBuffer)
     base_to_ar_tag = None
@@ -134,20 +130,44 @@ def set_joints():
         except :
             pass
     print(base_to_ar_tag)
+
+    print("PRINTING TRANSFORM FROM BASE TO CAMERA")
+    tfBuffer = tf2_ros.Buffer()
+    tfListener = tf2_ros.TransformListener(tfBuffer)
+    base_to_camera = None
+    while base_to_camera is None:
+    # Since it takes 20-30 times to get sucessfully tfBuffer lookup, this
+    # loop is necessary
+        try:
+            base_to_camera = tfBuffer.lookup_transform("base",camera_frame, rospy.Time())
+        except :
+            pass
+    print(base_to_camera)
+
+    # target goal is going to have the same transformation as the camera but the x, y would be the same as the base to AR tag x, y
+    target_goal = base_to_ar_tag
+    target_goal.transform.translation.z = base_to_camera.transform.translation.z
+
+    # t = base_to_ar_tag
+    # t_x = t.transform.translation.x * 100 + 650
+    # t_y = t.transform.translation.y * 100
+    # t_z = 150
+    
+    # print(t_x, t_y, t_z)
+
     raw_input("enter to confirm coords")
     # To make sure that the desired robot configuration is not  unreasonable
     # before moving there.  Just press enter.
     
-    #right.move_to_joint_positions(angles_to_dict(rj, convert_robot_coords_to_joint_angles(t_x, t_y, t_z)))
+    # FORWARD KINEMATICS
+    # right.move_to_joint_positions(angles_to_dict(rj, convert_robot_coords_to_joint_angles(t_x, t_y, t_z)))
 
     # ATTEMPT TRYING INVERSE KINEMATICS
     rospy.wait_for_service('compute_ik')
     # Create the function used to call the service
-    print("HERE1")
     compute_ik = rospy.ServiceProxy('compute_ik', GetPositionIK)
-    print("HERE2")
     arm = 'right'
-    move_gripper(compute_ik, arm, t.transform.translation, t.transform.rotation)
+    move_gripper(compute_ik, arm, target_goal.transform.translation, target_goal.transform.rotation)
     return
     # I was having problems with the code below, so I exit prematurely
     
