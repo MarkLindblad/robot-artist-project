@@ -34,10 +34,16 @@ def main():
     print("Enabling robot... ")
     rs.enable()
 
-    """
     controller = Controller()
-    controller.draw_image_line(-90, -90, 90, 90)
-    controller.draw_image_line(90, -90, -90, 90)
+    # controller.limb.move_to_neutral()
+    controller.move_to_robot_coords(600, -100, 120, True)
+    # controller.draw_image_line(-50, -50, 50, 50)
+    # controller.draw_image_line(50, -50, -50, 50)
+    # controller.draw_image_point(-50, -50)
+    # controller.draw_image_point(-50, 50)
+    # controller.draw_image_point(50, 50)
+    # controller.draw_image_point(50, -50)
+
     """
     lines = []
     with open('ball2_lines.txt') as f:
@@ -49,6 +55,7 @@ def main():
             lines.append(line)
     draw_lines(lines)
     print("Done.")
+    """
 
 
 if __name__ == '__main__':

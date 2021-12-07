@@ -19,7 +19,7 @@ class Controller:
 
     def set_joint_angles(self, angles):
         angles_dict = self.joint_angles_to_dict(angles)
-        self.limb.move_to_joint_positions(angles_dict, timeout=5.0, threshold=0.005)
+        self.limb.move_to_joint_positions(angles_dict, timeout=15.0, threshold=0.005)
         # prev_angles = self.limb.joint_angles()
         # def test():
         #     cur_angles = self.limb.joint_angles()
@@ -29,18 +29,20 @@ class Controller:
         #     for j in cur_angles:
         #         prev_angles[j] = cur_angles[j]
         #     return False
-        # self.limb.move_to_joint_positions(angles_dict, timeout=5.0, threshold=0.0, test=test)
+        # self.limb.move_to_joint_positions(angles_dict, timeout=15.0, threshold=0.0, test=test)
 
-    def move_to_robot_coords(self, rx, ry, rz):
-        self.set_joint_angles(self.convert_robot_coords_to_joint_angles(rx, ry, rz))
+    def move_to_robot_coords(self, rx, ry, rz, camera=False):
+        self.set_joint_angles(self.convert_robot_coords_to_joint_angles(rx, ry, rz, camera))
 
     def draw_image_point(self, ix, iy):
         rx, ry, rz = self.convert_image_to_robot_coords(ix, iy)
+        self.move_to_robot_coords(rx, ry, rz - 20)
+        self.limb.set_joint_position_speed(0.1)
+        rospy.sleep(0.3)
         self.move_to_robot_coords(rx, ry, rz - 50)
         rospy.sleep(0.3)
-        self.move_to_robot_coords(rx, ry, rz - 70)
-        rospy.sleep(0.3)
-        self.move_to_robot_coords(rx, ry, rz - 50)
+        self.move_to_robot_coords(rx, ry, rz - 20)
+        self.limb.set_joint_position_speed(0.3)
 
     def draw_image_line(self, ixs, iys, ixe, iye):
         self.limb.set_joint_position_speed(0.3)
@@ -77,7 +79,7 @@ class Controller:
         return py + x_ofs, -px + y_ofs, z_ofs
 
     @staticmethod
-    def convert_robot_coords_to_joint_angles(rx, ry, rz):
+    def convert_robot_coords_to_joint_angles(rx, ry, rz, camera=False):
         """
         Input: rx, ry, rz -- the coordinates of the joint above the end effector
         in order to draw on the paper (in millimeters from the base of the robot)
@@ -97,7 +99,7 @@ class Controller:
         j3 = 0.0
         j4 = 2 * compress_angle
         j5 = 0.0
-        j6 = math.pi / 2 - tilt_down_angle - compress_angle
+        j6 = (0 if camera else math.pi / 2) - tilt_down_angle - compress_angle
         j7 = math.pi / 2
         return j1, j2, j3, j4, j5, j6, j7
 
