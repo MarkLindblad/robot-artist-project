@@ -19,16 +19,17 @@ class Controller:
 
     def set_joint_angles(self, angles):
         angles_dict = self.joint_angles_to_dict(angles)
-        # self.limb.move_to_joint_positions(angles_dict, timeout=5.0, threshold=0.005)
-        prev_angles = self.limb.joint_angles()
-        def test():
-            cur_angles = self.limb.joint_angles()
-            if all(abs(cur_angles[j] - angles_dict[j]) < 0.005 for j in cur_angles) \
-                and all(cur_angles[j] == prev_angles[j] for j in cur_angles):
-                return True
-            prev_angles = cur_angles
-            return False
-        self.limb.move_to_joint_positions(angles_dict, timeout=5.0, threshold=0.0, test=test)
+        self.limb.move_to_joint_positions(angles_dict, timeout=5.0, threshold=0.005)
+        # prev_angles = self.limb.joint_angles()
+        # def test():
+        #     cur_angles = self.limb.joint_angles()
+        #     if all(abs(cur_angles[j] - angles_dict[j]) < 0.005 for j in cur_angles) \
+        #         and all(abs(cur_angles[j] - prev_angles[j]) < 0.001 for j in cur_angles):
+        #         return True
+        #     for j in cur_angles:
+        #         prev_angles[j] = cur_angles[j]
+        #     return False
+        # self.limb.move_to_joint_positions(angles_dict, timeout=5.0, threshold=0.0, test=test)
 
     def move_to_robot_coords(self, rx, ry, rz):
         self.set_joint_angles(self.convert_robot_coords_to_joint_angles(rx, ry, rz))
