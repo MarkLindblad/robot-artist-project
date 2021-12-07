@@ -15,7 +15,7 @@ def draw_lines(lines):
     controller = Controller()
     for i in range(len(lines)):
         print(i, lines[i])
-        controller.draw_image_line(lines[i][0] * 100 - 50, lines[i][2] * 100 + 150, lines[i][1] * 100 - 50, lines[i][3] * 100 + 150)
+        controller.draw_image_line(lines[i][0] * 180 - 90, lines[i][2] * 180 - 90, lines[i][1] * 180 - 90, lines[i][3] * 180 - 90)
 
 def main():
     print("Initializing node... ")
@@ -34,6 +34,11 @@ def main():
     print("Enabling robot... ")
     rs.enable()
 
+    """
+    controller = Controller()
+    controller.draw_image_line(-90, -90, 90, 90)
+    controller.draw_image_line(90, -90, -90, 90)
+    """
     lines = []
     with open('ball2_lines.txt') as f:
         for line in f:

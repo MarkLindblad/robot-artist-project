@@ -42,11 +42,8 @@ import matplotlib.pyplot as plt
 from coord_transform import convert_image_to_robot_coords, convert_robot_coords_to_joint_angles
 import dots
 
-import tf
 import rospy
 import tf2_ros
-from moveit_msgs.srv import GetPositionIK, GetPositionIKRequest, GetPositionIKResponse
-from moveit_commander import MoveGroupCommander
 
 import intera_interface
 import intera_external_devices
@@ -56,16 +53,9 @@ from intera_interface import CHECK_VERSION
 def angles_to_dict(rj, angles):
     return {rj[i]: angles[i] for i in range(len(rj))}
 
-top_left_paper_tag = "ar_marker_12"
-# You will need to update the name and id of the ar tag if you change
-# which one you are using.
-
+top_left_paper_tag = "ar_marker_3"
 #bottom_right_paper_tag = "ar_marker_4"
-# For the future, when we use the distance between the ar markers to
-# get the size of the paper from the ar tags themselves.
-
 camera_frame = "reference/right_hand_camera"
-# This should not change
 
 def set_joints():
     right = intera_interface.Limb('right')
@@ -76,104 +66,24 @@ def set_joints():
     # random.shuffle(image_coords)
 
     tfBuffer = tf2_ros.Buffer()
-    # The tf package creates and keeps track of recent transformations.
-    # This is the buffer where they are stored.
-
     tfListener = tf2_ros.TransformListener(tfBuffer)
-    # The tfListener variable is not used, but we need this line to create
-    # and keep the TransformListener
-    
     top_left_to_camera = None
-    # tfListener does not always work the first 20-30 times we try to do
-    # a tfBuffer lookup, so we need to repetitively try to get the
-    # top_left_to_camera transformation.
-    
-    compress_angle = np.pi / 4
-    right.move_to_joint_positions(angles_to_dict(rj, [0, -compress_angle, 0, compress_angle * 2, 0, -compress_angle, 0]))
-    # Puts the arm in the zero-angle configuration so that the camera is
-    # pointing a the ar tag near the paper
-    
+    right.move_to_joint_positions(angles_to_dict(rj, [0, 0, 0, 0, 0, 0, 0]))
     time.sleep(1)
-    # Wait for the robot to get to the zero-angle configuration
-
-    # COMMENTED CAMERA TO TAG TRANSFORMATION FOR NOW 
-    # while top_left_to_camera is None:
-    # # Since it takes 20-30 times to get sucessfully tfBuffer lookup, this
-    # # loop is necessary
-    #     try:
-    #         top_left_to_camera = tfBuffer.lookup_transform(top_left_paper_tag,camera_frame, rospy.Time())
-    #     except :
-    #         pass
-    # print(top_left_to_camera)
-
-    # t = top_left_to_camera
-    # TODO: Calculate the transformation from the robot base to the ar tag
-    # using the transformation from the end effector camera to the ar tag
-    # and the transformation from the base to the end effector given the
-    # joint angles
-    
-    # t_x = t.transform.translation.x * 100 + 650
-    # t_y = t.transform.translation.y * 100
-    # t_z = 150 #t.transform.translation.z * 100
-    
-    # print(t_x, t_y, t_z)
-    # print("PRINTING ROTATION")
-    # print(t)
-    print("PRINTING TRANSFORM FROM BASE TO AR TAG")
-    tfBuffer = tf2_ros.Buffer()
-    tfListener = tf2_ros.TransformListener(tfBuffer)
-    base_to_ar_tag = None
-    while base_to_ar_tag is None:
-    # Since it takes 20-30 times to get sucessfully tfBuffer lookup, this
-    # loop is necessary
+    while top_left_to_camera is None:
         try:
-            base_to_ar_tag = tfBuffer.lookup_transform("base",top_left_paper_tag, rospy.Time())
+            top_left_to_camera = tfBuffer.lookup_transform(top_left_paper_tag,camera_frame, rospy.Time())
         except :
             pass
-    print(base_to_ar_tag)
+    print(top_left_to_camera)
 
-    # print("PRINTING TRANSFORM FROM BASE TO CAMERA")
-    # tfBuffer = tf2_ros.Buffer()
-    # tfListener = tf2_ros.TransformListener(tfBuffer)
-    # base_to_camera = None
-    # while base_to_camera is None:
-    # # Since it takes 20-30 times to get sucessfully tfBuffer lookup, this
-    # # loop is necessary
-    #     try:
-    #         base_to_camera = tfBuffer.lookup_transform("base",camera_frame, rospy.Time())
-    #     except :
-    #         pass
-    # print(base_to_camera)
-
-    # target goal is going to have the same transformation as the camera but the x, y would be the same as the base to AR tag x, y
-    target_goal = base_to_ar_tag
-    # target_goal.transform.translation.z = base_to_camera.transform.translation.z
-
-    t = base_to_ar_tag
-    t_x = t.transform.translation.x * 1000
-    t_y = t.transform.translation.y * 1000
-    t_z = 150
-    # t_x = 1.5 * 100 + 650
-    # t_y = 0.9 * 100
-    # t_z = 150
-
-    print(t_x, t_y, t_z)
-
+    t = top_left_to_camera
+    print(t.transform.translation.x, t.transform.translation.y, t.transform.translation.z)
+    #print(convert_robot_coords_to_joint_angles(t.transform.translation.x, t.transform.translation.y, t.transform.translation.z))
     raw_input("enter to confirm coords")
-    # To make sure that the desired robot configuration is not  unreasonable
-    # before moving there.  Just press enter.
     
-    # FORWARD KINEMATICS
-    right.move_to_joint_positions(angles_to_dict(rj, convert_robot_coords_to_joint_angles(t_y, t_x, t_z)))
-
-    # ATTEMPT TRYING INVERSE KINEMATICS
-    # rospy.wait_for_service('compute_ik')
-    # # Create the function used to call the service
-    # compute_ik = rospy.ServiceProxy('compute_ik', GetPositionIK)
-    # arm = 'right'
-    # move_gripper(compute_ik, arm, target_goal.transform.translation, target_goal.transform.rotation)
+    right.move_to_joint_positions(angles_to_dict(rj, convert_robot_coords_to_joint_angles(t.transform.translation.x * 100 + 600, t.transform.translation.y * 100, 150)))
     return
-    # I was having problems with the code below, so I exit prematurely
     
     filename = 'sphere.jpg'
     img = np.array(cv2.imread(filename, 0))
@@ -232,49 +142,7 @@ def set_joints():
         # print("End positions: ", current_positions)
         print("End pose: ", right.endpoint_pose())
     """
-def move_gripper(compute_ik, arm, position, orientation):
-    request = GetPositionIKRequest()
-    request.ik_request.group_name = arm + "_arm"
 
-    link = arm + "_gripper"
-
-    request.ik_request.ik_link_name = link
-    request.ik_request.attempts = 20
-    request.ik_request.pose_stamped.header.frame_id = "base"
-    
-    # Set the desired orientation for the end effector HERE
-    request.ik_request.pose_stamped.pose.position.x = position.x
-    request.ik_request.pose_stamped.pose.position.y = position.y
-    request.ik_request.pose_stamped.pose.position.z = position.z        
-    request.ik_request.pose_stamped.pose.orientation.x = orientation.x
-    request.ik_request.pose_stamped.pose.orientation.y = orientation.y
-    request.ik_request.pose_stamped.pose.orientation.z = orientation.z
-    request.ik_request.pose_stamped.pose.orientation.w = orientation.w
-    request.ik_request.pose_stamped.pose.orientation.x = 0.0
-    request.ik_request.pose_stamped.pose.orientation.y = 1.0
-    request.ik_request.pose_stamped.pose.orientation.z = 0.0
-    request.ik_request.pose_stamped.pose.orientation.w = 0.0
-        
-    try:
-        # Send the request to the service
-        response = compute_ik(request)
-        
-        # Print the response HERE
-        print(response)
-        group = MoveGroupCommander(arm + "_arm")
-
-        # Setting position and orientation target
-        group.set_pose_target(request.ik_request.pose_stamped)
-
-        # TRY THIS
-        # Setting just the position without specifying the orientation
-        ###group.set_position_target(position)
-
-        # Plan IK and execute
-        group.go()
-            
-    except rospy.ServiceException, e:
-        print("Service call failed: %s")
 
 def main():
     """RSDK Joint Position Example: Keyboard Control
