@@ -36,7 +36,8 @@ def main():
 
     controller = Controller()
     # controller.limb.move_to_neutral()
-    controller.move_to_robot_coords(600, -100, 120, True)
+    # controller.move_to_robot_coords(600, -100, 120, True)
+    controller.move_to_robot_coords(768, -64, 120, False)
     # controller.draw_image_line(-50, -50, 50, 50)
     # controller.draw_image_line(50, -50, -50, 50)
     # controller.draw_image_point(-50, -50)

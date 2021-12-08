@@ -36,12 +36,12 @@ class Controller:
 
     def draw_image_point(self, ix, iy):
         rx, ry, rz = self.convert_image_to_robot_coords(ix, iy)
-        self.move_to_robot_coords(rx, ry, rz - 20)
+        self.move_to_robot_coords(rx, ry, rz - 10)
         self.limb.set_joint_position_speed(0.1)
         rospy.sleep(0.3)
-        self.move_to_robot_coords(rx, ry, rz - 50)
+        self.move_to_robot_coords(rx, ry, rz - 30)
         rospy.sleep(0.3)
-        self.move_to_robot_coords(rx, ry, rz - 20)
+        self.move_to_robot_coords(rx, ry, rz - 10)
         self.limb.set_joint_position_speed(0.3)
 
     def draw_image_line(self, ixs, iys, ixe, iye):
