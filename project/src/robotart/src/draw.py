@@ -3,6 +3,7 @@
 from __future__ import division, print_function
 
 from controller import Controller
+from find_ar_tags import find_ar_tags
 
 import cv2
 import numpy as np
@@ -40,17 +41,42 @@ def main():
 
     print("Enabling robot... ")
     rs.enable()
+    """
+    controller = Controller()
+    controller.draw_image_point(50, 150)
+    return
+    """
 
-    # controller = Controller()
+    ar_tag_pos = find_ar_tags(["ar_marker_3", "ar_marker_4", "ar_marker_6", "ar_marker_7"])
+    if ar_tag_pos is None:
+        return
+    x_pos = [ar_tag_pos[ar_tag][0] for ar_tag in ar_tag_pos]
+    y_pos = [ar_tag_pos[ar_tag][1] for ar_tag in ar_tag_pos]
+    x_pos.sort()
+    y_pos.sort()
+    x_center = sum(x_pos) / len(x_pos)
+    y_center = sum(y_pos) / len(y_pos)
+    width = x_pos[2] - x_pos[1] - 45
+    height = y_pos[2] - y_pos[1] - 45
+
+    controller = Controller()
     # controller.limb.move_to_neutral()
-    # controller.move_to_robot_coords(600, -100, 120, True)
+    # controller.move_to_robot_coords(600, -100, 170, True)
     # controller.move_to_robot_coords(768, -64, 120, False)
-    # controller.draw_image_line(-50, -50, 50, 50)
+    width *= 0.8
+    height *= 0.8
+    controller.draw_image_line(x_center - width / 2, y_center - height / 2, x_center + width / 2, y_center + height / 2)
+    controller.draw_image_line(x_center - width / 2, y_center + height / 2, x_center + width / 2, y_center - height / 2)
+    controller.draw_image_line(x_center - width / 2, y_center - height / 2, x_center + width / 2, y_center - height / 2)
+    controller.draw_image_line(x_center + width / 2, y_center - height / 2, x_center + width / 2, y_center + height / 2)
+    controller.draw_image_line(x_center + width / 2, y_center + height / 2, x_center - width / 2, y_center + height / 2)
+    controller.draw_image_line(x_center - width / 2, y_center + height / 2, x_center - width / 2, y_center - height / 2)
     # controller.draw_image_line(50, -50, -50, 50)
     # controller.draw_image_point(-50, -50)
     # controller.draw_image_point(-50, 50)
     # controller.draw_image_point(50, 50)
     # controller.draw_image_point(50, -50)
+    return
 
     """
     lines = []

@@ -10,9 +10,11 @@ import rospy
 
 class Controller:
 
-    def __init__(self):
+    def __init__(self, up=-50, down=-70):
         self.limb = intera_interface.Limb('right')
         self.joint_names = self.limb.joint_names()
+        self.pen_up_offset = up
+        self.pen_down_offset = down
 
     def joint_angles_to_dict(self, angles):
         return {self.joint_names[i]: angles[i] for i in range(len(self.joint_names))}
@@ -36,12 +38,12 @@ class Controller:
 
     def draw_image_point(self, ix, iy):
         rx, ry, rz = self.convert_image_to_robot_coords(ix, iy)
-        self.move_to_robot_coords(rx, ry, rz - 10)
+        self.move_to_robot_coords(rx, ry, rz + self.pen_up_offset)
         self.limb.set_joint_position_speed(0.1)
         rospy.sleep(0.3)
-        self.move_to_robot_coords(rx, ry, rz - 30)
+        self.move_to_robot_coords(rx, ry, rz + self.pen_down_offset)
         rospy.sleep(0.3)
-        self.move_to_robot_coords(rx, ry, rz - 10)
+        self.move_to_robot_coords(rx, ry, rz + self.pen_up_offset)
         self.limb.set_joint_position_speed(0.3)
 
     def draw_image_line(self, ixs, iys, ixe, iye):
@@ -50,18 +52,18 @@ class Controller:
         rxe, rye, rz = self.convert_image_to_robot_coords(ixe, iye)
         dist = math.sqrt((rxs - rxe) ** 2 + (rys - rye) ** 2)
         steps = int(dist // 1) + 1
-        self.move_to_robot_coords(rxs, rys, rz - 30)
+        self.move_to_robot_coords(rxs, rys, rz + self.pen_up_offset)
         self.limb.set_joint_position_speed(0.1)
         rospy.sleep(0.3)
         for i in range(steps + 1):
             rx = rxs + (rxe - rxs) * (i / steps)
             ry = rys + (rye - rys) * (i / steps)
-            self.move_to_robot_coords(rx, ry, rz - 50)
+            self.move_to_robot_coords(rx, ry, rz + self.pen_down_offset)
             if i == 0:
                 self.limb.set_joint_position_speed(0.3)
         self.limb.set_joint_position_speed(0.1)
         rospy.sleep(0.3)
-        self.move_to_robot_coords(rxe, rye, rz - 30)
+        self.move_to_robot_coords(rxe, rye, rz + self.pen_up_offset)
 
     @staticmethod
     def convert_image_to_robot_coords(px, py, x_ofs=600, y_ofs=0, z_ofs=150):

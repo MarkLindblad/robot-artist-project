@@ -12,6 +12,44 @@ import intera_external_devices
 
 from intera_interface import CHECK_VERSION
 
+def find_ar_tags(ar_tags):
+    ar_tags_translations = {}
+    for ar_tag in ar_tags:
+        ar_tags_translations[ar_tag] = {'x': [], 'y': [], 'z': []}
+
+    tf_buffer = tf2_ros.Buffer()
+    tf_listener = tf2_ros.TransformListener(tf_buffer)
+
+    controller = Controller()
+    for x in range(500, 750, 50):
+        for y in range(-100, 150, 50):
+            controller.move_to_robot_coords(x, y, 120, True)
+            rospy.sleep(1)
+            for ar_tag in ar_tags:
+                try:
+                    ar_tag_transform = tf_buffer.lookup_transform("base", ar_tag, rospy.Time())
+                    ar_tags_translations[ar_tag]['x'].append(ar_tag_transform.transform.translation.x)
+                    ar_tags_translations[ar_tag]['y'].append(ar_tag_transform.transform.translation.y)
+                    ar_tags_translations[ar_tag]['z'].append(ar_tag_transform.transform.translation.z)
+                except:
+                    pass
+
+    for ar_tag in ar_tags:
+        if len(ar_tags_translations[ar_tag]['x']) == 0:
+            print(ar_tag, "not found")
+            return None
+    ar_tag_positions = {}
+    for ar_tag in ar_tags:
+        count = len(ar_tags_translations[ar_tag]['x'])
+        ar_tags_translations[ar_tag]['x'].sort()
+        ar_tags_translations[ar_tag]['y'].sort()
+        ar_tag_positions[ar_tag] = (500 * (ar_tags_translations[ar_tag]['x'][count // 2] + ar_tags_translations[ar_tag]['x'][(count - 1) // 2]), 500 * (ar_tags_translations[ar_tag]['y'][count // 2] + ar_tags_translations[ar_tag]['y'][(count - 1) // 2]))
+        print(ar_tag, ":", ar_tag_positions[ar_tag])
+        # verifying position
+        controller.move_to_robot_coords(ar_tag_positions[ar_tag][0], ar_tag_positions[ar_tag][1], 100, False)
+        rospy.sleep(1)
+    return ar_tag_positions
+
 def main():
     print("Initializing node... ")
     rospy.init_node("rsdk_joint_position_keyboard")
@@ -40,7 +78,7 @@ def main():
     controller = Controller()
     for x in range(500, 750, 50):
         for y in range(-100, 150, 50):
-            controller.move_to_robot_coords(x, y, 120, True)
+            controller.move_to_robot_coords(x, y, 170, True)
             rospy.sleep(1)
             for ar_tag in ar_tags:
                 try:
