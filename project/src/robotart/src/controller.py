@@ -50,18 +50,18 @@ class Controller:
         rxe, rye, rz = self.convert_image_to_robot_coords(ixe, iye)
         dist = math.sqrt((rxs - rxe) ** 2 + (rys - rye) ** 2)
         steps = int(dist // 1) + 1
-        self.move_to_robot_coords(rxs, rys, rz - 5)
+        self.move_to_robot_coords(rxs, rys, rz - 30)
         self.limb.set_joint_position_speed(0.1)
         rospy.sleep(0.3)
         for i in range(steps + 1):
             rx = rxs + (rxe - rxs) * (i / steps)
             ry = rys + (rye - rys) * (i / steps)
-            self.move_to_robot_coords(rx, ry, rz - 30)
+            self.move_to_robot_coords(rx, ry, rz - 50)
             if i == 0:
                 self.limb.set_joint_position_speed(0.3)
         self.limb.set_joint_position_speed(0.1)
         rospy.sleep(0.3)
-        self.move_to_robot_coords(rxe, rye, rz - 5)
+        self.move_to_robot_coords(rxe, rye, rz - 30)
 
     @staticmethod
     def convert_image_to_robot_coords(px, py, x_ofs=600, y_ofs=0, z_ofs=150):
@@ -100,6 +100,6 @@ class Controller:
         j4 = 2 * compress_angle
         j5 = 0.0
         j6 = (0 if camera else math.pi / 2) - tilt_down_angle - compress_angle
-        j7 = math.pi / 2
+        j7 = math.pi / 2 + 0.15 # 0.15 for calibration adjustment on Ada
         return j1, j2, j3, j4, j5, j6, j7
 
