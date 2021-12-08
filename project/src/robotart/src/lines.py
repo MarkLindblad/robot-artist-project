@@ -1,4 +1,4 @@
-from __future__ import print_function, division
+from __future__ import division
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
@@ -37,7 +37,6 @@ def hatch(img, threshhold = 0.5, angle = 45, number = 30, cropped = False):
             px = int(round(x))
             py = int(-(round(y) + 1))
 
-
             if py < 0 and py > -(img.shape[0] + 1):
                 done = False
 
@@ -65,11 +64,17 @@ def crosshatch(img, layers = 10, blacks = 0, whites = 1, brightness = 0, number 
         threshhold = (i/(layers - 1))*(whites - blacks) + blacks + brightness
 
         new = hatch(img, threshhold = threshhold, angle = angle + 70*i, number = number, cropped = True)
-        
         lines = np.vstack((lines, new))
 
+    for l in range(lines.shape[0]):
+        for i in range(2):
+            if np.min(lines[l, 2 + i]) < 0:
+                print(lines[l])
+                lines[l, 0 + i] = -lines[l, 2]*(lines[l, 1] - lines[l, 0])/(lines[l, 3] - lines[l, 2]) + lines[l, 0]
+                lines[l, 2 + i] = 0
+                print(lines[l])
+
     lines = lines[~np.all(lines == 0, axis = 1)]
-    print('Number of lines: ', lines.shape[0])
 
     return lines
 

@@ -16,14 +16,11 @@ import intera_external_devices
 
 from intera_interface import CHECK_VERSION
 
-def draw_lines(lines):
-    controller = Controller()
+def draw_lines(controller, width, height, lines):
+    # controller = Controller()
     for i in range(len(lines)):
         print(i, lines[i])
-        if lines[i][0] < 0.0 or lines[i][0] > 1.0 or lines[i][1] < 0.0 or lines[i][1] > 1.0 or lines[i][2] < 0.0 or lines[i][2] > 1.0 or lines[i][3] < 0.0 or lines[i][3] > 1.0:
-            print("Bad line")
-            continue
-        controller.draw_image_line(lines[i][0] * 100 - 50, lines[i][2] * 100 - 50, lines[i][1] * 100 - 50, lines[i][3] * 100 - 50)
+        controller.draw_image_line(lines[i][0] * width - width / 2, lines[i][2] * height - height / 2, lines[i][1] * width - width / 2, lines[i][3] * height - height / 2)
 
 def main():
     print("Initializing node... ")
@@ -66,6 +63,7 @@ def main():
     x_center, y_center, width, height = 707.07331582, -109.566561181, 110.33267366, 187.66238968
 
     controller = Controller(x_image_offset=x_center, y_image_offset=y_center)
+    """
     # controller.limb.move_to_neutral()
     # controller.move_to_robot_coords(600, -100, 170, True)
     # controller.move_to_robot_coords(768, -64, 120, False)
@@ -104,6 +102,7 @@ def main():
     # controller.draw_image_point(50, 50)
     # controller.draw_image_point(50, -50)
     return
+    """
 
     """
     lines = []
@@ -115,8 +114,9 @@ def main():
             line = [float(x) for x in line]
             lines.append(line)
     """
-    img = np.array(cv2.imread('raven_huang.jpg', 0))
-    draw_lines(crosshatch(img, blacks = 0, whites = 0.9, layers = 7, number = 50))
+    img = np.zeros((200, 200))
+    
+    draw_lines(controller, width, height, crosshatch(img, blacks = 0, whites = 0.9, layers = 7, number = 7))
     print("Done.")
 
 
