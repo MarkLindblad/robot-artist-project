@@ -21,8 +21,9 @@ def find_ar_tags(ar_tags):
     tf_listener = tf2_ros.TransformListener(tf_buffer)
 
     controller = Controller()
-    for x in range(500, 750, 50):
-        for y in range(-100, 150, 50):
+    controller.limb.set_joint_position_speed(0.3)
+    for x in range(600, 800, 50):
+        for y in range(-200, 50, 50):
             controller.move_to_robot_coords(x, y, 120, True)
             rospy.sleep(1)
             for ar_tag in ar_tags:
@@ -46,7 +47,7 @@ def find_ar_tags(ar_tags):
         ar_tag_positions[ar_tag] = (500 * (ar_tags_translations[ar_tag]['x'][count // 2] + ar_tags_translations[ar_tag]['x'][(count - 1) // 2]), 500 * (ar_tags_translations[ar_tag]['y'][count // 2] + ar_tags_translations[ar_tag]['y'][(count - 1) // 2]))
         print(ar_tag, ":", ar_tag_positions[ar_tag])
         # verifying position
-        controller.move_to_robot_coords(ar_tag_positions[ar_tag][0], ar_tag_positions[ar_tag][1], 100, False)
+        controller.move_to_robot_coords(ar_tag_positions[ar_tag][0], ar_tag_positions[ar_tag][1], 150, False)
         rospy.sleep(1)
     return ar_tag_positions
 
@@ -76,8 +77,8 @@ def main():
     tf_listener = tf2_ros.TransformListener(tf_buffer)
 
     controller = Controller()
-    for x in range(500, 750, 50):
-        for y in range(-100, 150, 50):
+    for x in range(600, 850, 50):
+        for y in range(-300, -50, 50):
             controller.move_to_robot_coords(x, y, 170, True)
             rospy.sleep(1)
             for ar_tag in ar_tags:

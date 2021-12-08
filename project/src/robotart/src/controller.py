@@ -10,11 +10,15 @@ import rospy
 
 class Controller:
 
-    def __init__(self, up=-50, down=-70):
+    def __init__(self, up=-17, down=-37, x_image_offset=600, y_image_offset=0, z_image_offset=150):
         self.limb = intera_interface.Limb('right')
         self.joint_names = self.limb.joint_names()
         self.pen_up_offset = up
         self.pen_down_offset = down
+        # offsets in the robot coordinates
+        self.x_image_offset = x_image_offset
+        self.y_image_offset = y_image_offset
+        self.z_image_offset = z_image_offset
 
     def joint_angles_to_dict(self, angles):
         return {self.joint_names[i]: angles[i] for i in range(len(self.joint_names))}
@@ -65,8 +69,7 @@ class Controller:
         rospy.sleep(0.3)
         self.move_to_robot_coords(rxe, rye, rz + self.pen_up_offset)
 
-    @staticmethod
-    def convert_image_to_robot_coords(px, py, x_ofs=600, y_ofs=0, z_ofs=150):
+    def convert_image_to_robot_coords(self, px, py):
         """
         Input: px, py -- the number of millimeters from the center of the paper
         Output: rx, ry, rz -- the coordinates of the joint above the end effector
@@ -78,10 +81,9 @@ class Controller:
         # x_ofs is distance from robot base to center of paper in rx direction
         # y_ofs is distance from robot base to center of paper in ry direction
         # z_ofs is distance from desired joint position above end effector to robot base in rz direction
-        return py + x_ofs, -px + y_ofs, z_ofs
+        return py + self.x_image_offset, -px + self.y_image_offset, self.z_image_offset
 
-    @staticmethod
-    def convert_robot_coords_to_joint_angles(rx, ry, rz, camera=False):
+    def convert_robot_coords_to_joint_angles(self, rx, ry, rz, camera=False):
         """
         Input: rx, ry, rz -- the coordinates of the joint above the end effector
         in order to draw on the paper (in millimeters from the base of the robot)

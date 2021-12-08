@@ -40,13 +40,15 @@ def main():
     rospy.on_shutdown(clean_shutdown)
 
     print("Enabling robot... ")
-    rs.enable()
+
     """
+    rs.enable()
     controller = Controller()
     controller.draw_image_point(50, 150)
     return
     """
 
+    """
     ar_tag_pos = find_ar_tags(["ar_marker_3", "ar_marker_4", "ar_marker_6", "ar_marker_7"])
     if ar_tag_pos is None:
         return
@@ -56,21 +58,46 @@ def main():
     y_pos.sort()
     x_center = sum(x_pos) / len(x_pos)
     y_center = sum(y_pos) / len(y_pos)
-    width = x_pos[2] - x_pos[1] - 45
-    height = y_pos[2] - y_pos[1] - 45
+    height = x_pos[2] - x_pos[1] - 45
+    width = y_pos[2] - y_pos[1] - 45
+    print(x_center, y_center, width, height)
+    """
 
-    controller = Controller()
+    x_center, y_center, width, height = 707.07331582, -109.566561181, 110.33267366, 187.66238968
+
+    controller = Controller(x_image_offset=x_center, y_image_offset=y_center)
     # controller.limb.move_to_neutral()
     # controller.move_to_robot_coords(600, -100, 170, True)
     # controller.move_to_robot_coords(768, -64, 120, False)
     width *= 0.8
     height *= 0.8
-    controller.draw_image_line(x_center - width / 2, y_center - height / 2, x_center + width / 2, y_center + height / 2)
-    controller.draw_image_line(x_center - width / 2, y_center + height / 2, x_center + width / 2, y_center - height / 2)
-    controller.draw_image_line(x_center - width / 2, y_center - height / 2, x_center + width / 2, y_center - height / 2)
-    controller.draw_image_line(x_center + width / 2, y_center - height / 2, x_center + width / 2, y_center + height / 2)
-    controller.draw_image_line(x_center + width / 2, y_center + height / 2, x_center - width / 2, y_center + height / 2)
-    controller.draw_image_line(x_center - width / 2, y_center + height / 2, x_center - width / 2, y_center - height / 2)
+    width = min(width, height)
+    height = min(width, height)
+
+    def rotate_point(x, y, theta):
+        new_x = np.cos(theta) * x - np.sin(theta) * y
+        new_y = np.sin(theta) * x + np.cos(theta) * y
+        return new_x, new_y
+
+    grid_size = 4
+    for i in range(grid_size + 1):
+        offset = width * i / grid_size
+        sx, sy = rotate_point(-width / 2 + offset, -height / 2, np.pi * 0)
+        ex, ey = rotate_point(-width / 2 + offset, height / 2, np.pi * 0)
+        controller.draw_image_line(sx, sy, ex, ey)
+    for i in range(grid_size + 1):
+        offset = height * i / grid_size
+        sx, sy = rotate_point(-width / 2, -height / 2 + offset, np.pi * 0)
+        ex, ey = rotate_point(width / 2, -height / 2 + offset, np.pi * 0)
+        controller.draw_image_line(sx, sy, ex, ey)
+
+    # controller.draw_image_line(-width / 2, -height / 2,  width / 2,  height / 2)
+    # controller.draw_image_line(-width / 2,  height / 2,  width / 2, -height / 2)
+    # controller.draw_image_line(-width / 2, -height / 2,  width / 2, -height / 2)
+    # controller.draw_image_line( width / 2, -height / 2,  width / 2,  height / 2)
+    # controller.draw_image_line( width / 2,  height / 2, -width / 2,  height / 2)
+    # controller.draw_image_line(-width / 2,  height / 2, -width / 2, -height / 2)
+
     # controller.draw_image_line(50, -50, -50, 50)
     # controller.draw_image_point(-50, -50)
     # controller.draw_image_point(-50, 50)
