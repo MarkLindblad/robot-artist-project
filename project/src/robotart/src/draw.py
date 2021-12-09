@@ -8,6 +8,7 @@ from find_ar_tags import find_ar_tags
 import cv2
 import numpy as np
 from lines import crosshatch
+from lines import preview
 
 import rospy
 
@@ -26,6 +27,14 @@ def draw_lines(controller, width, height, lines):
         controller.draw_image_line(lines[i][0] * width - width / 2, lines[i][2] * height - height / 2, lines[i][1] * width - width / 2, lines[i][3] * height - height / 2)
 
 def main():
+    #img = np.array(cv2.imread('sphere.jpg', 0))
+    img = np.array(cv2.imread('team.png', 0))
+    
+    #lines = crosshatch(img, blacks = 0, whites = 0.9, layers = 20, number = 50)
+    lines = crosshatch(img, blacks = 0, whites = 0.9, layers = 4, number = 50)
+    print(len(lines))
+    preview(img, lines)
+    
     print("Initializing node... ")
     rospy.init_node("rsdk_joint_position_keyboard")
     print("Getting robot state... ")
@@ -42,6 +51,7 @@ def main():
     print("Enabling robot... ")
 
     rs.enable()
+
     """
     controller = Controller()
     controller.draw_image_point(50, 150)
@@ -66,8 +76,8 @@ def main():
 
     # x_center, y_center, width, height = 707.07331582, -109.566561181, 110.33267366, 187.66238968
     # x_center, y_center, width, height = 721.69355853, 43.3199727493, 110.623654019, 173.67529288
-    width *= 0.8
-    height *= 0.8
+    width *= 0.95
+    height *= 0.95
     width = min(width, height)
     height = min(width, height)
 
@@ -122,9 +132,19 @@ def main():
     # img = np.zeros((200, 200))
     # draw_lines(controller, width, height, crosshatch(img, blacks = 0, whites = 0.9, layers = 7, number = 7))
     # return
-    # img = np.array(cv2.imread('raven_huang.jpg', 0))
-    img = np.array(cv2.imread('sphere.jpg', 0))
-    draw_lines(controller, width, height, crosshatch(img, blacks = 0, whites = 0.9, layers = 7, number = 50))
+
+    #img = np.array(cv2.imread('raven_huang.jpg', 0))
+    #lines = crosshatch(img, blacks = 0, whites = 0.9, layers = 8, number = 60)
+    
+    #preview(img, lines)
+
+    """
+    img = np.array(cv2.imread('raven_huang.jpg', 0))
+    lines = crosshatch(img, blacks = 0, whites = 0.9, layers = 7, number = 50)
+    preview(img, lines)
+    """
+    # img = np.array(cv2.imread('sphere.jpg', 0))
+    draw_lines(controller, width, height, lines)
 
     return
     print("Done.")

@@ -10,7 +10,7 @@ import rospy
 
 class Controller:
 
-    def __init__(self, up=-23, down=-43, x_image_offset=600, y_image_offset=0, z_image_offset=150):
+    def __init__(self, up=-28, down=-43, x_image_offset=600, y_image_offset=0, z_image_offset=150):
         self.limb = intera_interface.Limb('right')
         self.joint_names = self.limb.joint_names()
         self.pen_up_offset = up
@@ -51,7 +51,7 @@ class Controller:
         self.limb.set_joint_position_speed(0.3)
 
     def draw_image_line(self, ixs, iys, ixe, iye):
-        self.limb.set_joint_position_speed(0.3)
+        self.limb.set_joint_position_speed(0.1)
         rxs, rys, rz = self.convert_image_to_robot_coords(ixs, iys)
         rxe, rye, rz = self.convert_image_to_robot_coords(ixe, iye)
         dist = math.sqrt((rxs - rxe) ** 2 + (rys - rye) ** 2)
