@@ -10,7 +10,7 @@ import rospy
 
 class Controller:
 
-    def __init__(self, up=-17, down=-37, x_image_offset=600, y_image_offset=0, z_image_offset=150):
+    def __init__(self, up=-23, down=-43, x_image_offset=600, y_image_offset=0, z_image_offset=150):
         self.limb = intera_interface.Limb('right')
         self.joint_names = self.limb.joint_names()
         self.pen_up_offset = up
@@ -55,16 +55,17 @@ class Controller:
         rxs, rys, rz = self.convert_image_to_robot_coords(ixs, iys)
         rxe, rye, rz = self.convert_image_to_robot_coords(ixe, iye)
         dist = math.sqrt((rxs - rxe) ** 2 + (rys - rye) ** 2)
-        steps = int(dist // 1) + 1
+        steps = int(dist // 5) + 1
         self.move_to_robot_coords(rxs, rys, rz + self.pen_up_offset)
         self.limb.set_joint_position_speed(0.1)
         rospy.sleep(0.3)
+        steps = 1 # TODO: REMOVE THIS
         for i in range(steps + 1):
             rx = rxs + (rxe - rxs) * (i / steps)
             ry = rys + (rye - rys) * (i / steps)
             self.move_to_robot_coords(rx, ry, rz + self.pen_down_offset)
             if i == 0:
-                self.limb.set_joint_position_speed(0.3)
+                self.limb.set_joint_position_speed(0.1)
         self.limb.set_joint_position_speed(0.1)
         rospy.sleep(0.3)
         self.move_to_robot_coords(rxe, rye, rz + self.pen_up_offset)

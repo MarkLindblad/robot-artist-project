@@ -20,6 +20,9 @@ def draw_lines(controller, width, height, lines):
     # controller = Controller()
     for i in range(len(lines)):
         print(i, lines[i])
+        if lines[i][0] < -0.001 or lines[i][0] > 1.001 or lines[i][1] < -0.001 or lines[i][1] > 1.001 or lines[i][2] < -0.001 or lines[i][2] > 1.001 or lines[i][3] < -0.001 or lines[i][3] > 1.001:
+            print("Bad line")
+            continue
         controller.draw_image_line(lines[i][0] * width - width / 2, lines[i][2] * height - height / 2, lines[i][1] * width - width / 2, lines[i][3] * height - height / 2)
 
 def main():
@@ -38,14 +41,14 @@ def main():
 
     print("Enabling robot... ")
 
-    """
     rs.enable()
+    """
     controller = Controller()
     controller.draw_image_point(50, 150)
     return
     """
 
-    """
+    
     ar_tag_pos = find_ar_tags(["ar_marker_3", "ar_marker_4", "ar_marker_6", "ar_marker_7"])
     if ar_tag_pos is None:
         return
@@ -58,19 +61,21 @@ def main():
     height = x_pos[2] - x_pos[1] - 45
     width = y_pos[2] - y_pos[1] - 45
     print(x_center, y_center, width, height)
-    """
+    #return
+    
 
-    x_center, y_center, width, height = 707.07331582, -109.566561181, 110.33267366, 187.66238968
+    # x_center, y_center, width, height = 707.07331582, -109.566561181, 110.33267366, 187.66238968
+    # x_center, y_center, width, height = 721.69355853, 43.3199727493, 110.623654019, 173.67529288
+    width *= 0.8
+    height *= 0.8
+    width = min(width, height)
+    height = min(width, height)
 
     controller = Controller(x_image_offset=x_center, y_image_offset=y_center)
     """
     # controller.limb.move_to_neutral()
     # controller.move_to_robot_coords(600, -100, 170, True)
     # controller.move_to_robot_coords(768, -64, 120, False)
-    width *= 0.8
-    height *= 0.8
-    width = min(width, height)
-    height = min(width, height)
 
     def rotate_point(x, y, theta):
         new_x = np.cos(theta) * x - np.sin(theta) * y
@@ -114,9 +119,14 @@ def main():
             line = [float(x) for x in line]
             lines.append(line)
     """
-    img = np.zeros((200, 200))
-    
-    draw_lines(controller, width, height, crosshatch(img, blacks = 0, whites = 0.9, layers = 7, number = 7))
+    # img = np.zeros((200, 200))
+    # draw_lines(controller, width, height, crosshatch(img, blacks = 0, whites = 0.9, layers = 7, number = 7))
+    # return
+    # img = np.array(cv2.imread('raven_huang.jpg', 0))
+    img = np.array(cv2.imread('sphere.jpg', 0))
+    draw_lines(controller, width, height, crosshatch(img, blacks = 0, whites = 0.9, layers = 7, number = 50))
+
+    return
     print("Done.")
 
 
