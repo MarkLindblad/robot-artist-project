@@ -21,6 +21,8 @@ def hatch(img, threshhold = 0.5, angle = 45, number = 30, cropped = False):
     dy = abs(spacing/np.cos(angle*np.pi/180))
     lines = np.array([0, 0, 0, 0])
 
+    zigzag = True
+
     done = False
     i = 1
     while not done:
@@ -34,8 +36,8 @@ def hatch(img, threshhold = 0.5, angle = 45, number = 30, cropped = False):
         
         for x in np.arange(0, img.shape[1] - 0.5, 0.5):
             y = m*x + b
-            px = int(round(x))
-            py = int(-(round(y) + 1))
+            px = round(x)
+            py = -(round(y) + 1)
 
             if py < 0 and py > -(img.shape[0] + 1):
                 done = False
@@ -45,11 +47,20 @@ def hatch(img, threshhold = 0.5, angle = 45, number = 30, cropped = False):
                     x1, y1 = x/img.shape[1], y/img.shape[0]
                 elif drawing and img[py, px] > threshhold*255:
                     drawing = False
-                    lines = np.vstack((lines, [x1, x/img.shape[1], y1, y/img.shape[0]]))
+                    if zigzag:
+                        lines = np.vstack((lines, [x1, x/img.shape[1], y1, y/img.shape[0]]))
+                    else:
+                        lines = np.vstack((lines, [x/img.shape[1], x1, y/img.shape[0], y1]))
+
         
         if drawing:
             drawing = False
-            lines = np.vstack((lines, [x1, x/img.shape[1], y1, y/img.shape[0]]))    
+            if zigzag:
+                lines = np.vstack((lines, [x1, x/img.shape[1], y1, y/img.shape[0]]))
+            else:
+                lines = np.vstack((lines, [x/img.shape[1], x1, y/img.shape[0], y1]))   
+
+        zigzag = not zigzag
 
         i += 1
 
@@ -65,14 +76,19 @@ def crosshatch(img, layers = 10, blacks = 0, whites = 1, brightness = 0, number 
 
         new = hatch(img, threshhold = threshhold, angle = angle + 70*i, number = number, cropped = True)
         lines = np.vstack((lines, new))
+        #preview(lines)
 
     for l in range(lines.shape[0]):
         for i in range(2):
             if np.min(lines[l, 2 + i]) < 0:
-                print(lines[l])
                 lines[l, 0 + i] = -lines[l, 2]*(lines[l, 1] - lines[l, 0])/(lines[l, 3] - lines[l, 2]) + lines[l, 0]
                 lines[l, 2 + i] = 0
-                print(lines[l])
+
+    for l in range(lines.shape[0]):
+        for i in range(2):
+            if np.min(lines[l, 2 + i]) > 1:
+                lines[l, 0 + i] = (1 - lines[l, 2])*(lines[l, 1] - lines[l, 0])/(lines[l, 3] - lines[l, 2]) + lines[l, 0]
+                lines[l, 2 + i] = 1
 
     lines = lines[~np.all(lines == 0, axis = 1)]
 
@@ -148,6 +164,10 @@ def levels(img):
     plt.show()
 
 if __name__ == "__main__":
+    img = np.zeros((200, 200))
+    lines = crosshatch(img, blacks = 0, whites = 1, layers = 5, number = 5)
+    preview(lines)
+
     img = np.array(cv2.imread('ball2.jpg', 0))
     lines = crosshatch(img, blacks = 0, whites = 0.9, layers = 7, number = 60)
     preview(lines)
