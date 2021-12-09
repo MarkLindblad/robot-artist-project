@@ -36,8 +36,8 @@ def hatch(img, threshhold = 0.5, angle = 45, number = 30, cropped = False):
         
         for x in np.arange(0, img.shape[1] - 0.5, 0.5):
             y = m*x + b
-            px = round(x)
-            py = -(round(y) + 1)
+            px = int(round(x))
+            py = int(-(round(y) + 1))
 
             if py < 0 and py > -(img.shape[0] + 1):
                 done = False
@@ -76,7 +76,6 @@ def crosshatch(img, layers = 10, blacks = 0, whites = 1, brightness = 0, number 
 
         new = hatch(img, threshhold = threshhold, angle = angle + 70*i, number = number, cropped = True)
         lines = np.vstack((lines, new))
-        #preview(lines)
 
     for l in range(lines.shape[0]):
         for i in range(2):
