@@ -23,7 +23,7 @@ def find_ar_tags(ar_tags):
     controller = Controller()
     controller.limb.set_joint_position_speed(0.3)
     for x in range(600, 800, 50):
-        for y in range(-200, 50, 50):
+        for y in range(-50, 200, 50):
             controller.move_to_robot_coords(x, y, 120, True)
             rospy.sleep(1)
             for ar_tag in ar_tags:
