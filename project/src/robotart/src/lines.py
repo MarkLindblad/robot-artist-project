@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.collections import cm
+from matplotlib.animation import FuncAnimation
 
 def crop(img):
     if img.shape[0] > img.shape[1]:
@@ -19,8 +20,8 @@ def hatch(img, threshhold = 0.5, angle = 45, number = 30, cropped = False):
     spacing = img.shape[0]/(number + 2)
     m = np.tan(angle*np.pi/180)
     dy = abs(spacing/np.cos(angle*np.pi/180))
-    lines = np.array([0, 0, 0, 0])
 
+    lines = np.array([0, 0, 0, 0])
     zigzag = True
 
     done = False
@@ -33,6 +34,7 @@ def hatch(img, threshhold = 0.5, angle = 45, number = 30, cropped = False):
 
         done = True
         drawing = False
+        new = np.array([0, 0, 0, 0])
         
         for x in np.arange(0, img.shape[1] - 0.5, 0.5):
             y = m*x + b
@@ -48,21 +50,37 @@ def hatch(img, threshhold = 0.5, angle = 45, number = 30, cropped = False):
                 elif drawing and img[py, px] > threshhold*255:
                     drawing = False
                     if zigzag:
-                        lines = np.vstack((lines, [x1, x/img.shape[1], y1, y/img.shape[0]]))
+                        new = np.vstack((new, [x1, x/img.shape[1], y1, y/img.shape[0]]))
                     else:
-                        lines = np.vstack((lines, [x/img.shape[1], x1, y/img.shape[0], y1]))
-
+                        new = np.vstack(([x/img.shape[1], x1, y/img.shape[0], y1], new))
         
         if drawing:
             drawing = False
             if zigzag:
-                lines = np.vstack((lines, [x1, x/img.shape[1], y1, y/img.shape[0]]))
+                new = np.vstack((new, [x1, x/img.shape[1], y1, y/img.shape[0]]))
             else:
-                lines = np.vstack((lines, [x/img.shape[1], x1, y/img.shape[0], y1]))   
+                new = np.vstack(([x/img.shape[1], x1, y/img.shape[0], y1], new))
 
         zigzag = not zigzag
 
+        lines = np.vstack((lines, new))
+
         i += 1
+
+    if lines.shape[0] > 1:    
+        for l in range(lines.shape[0]):
+            for i in range(2):
+                if np.min(lines[l, 2 + i]) < 0:
+                    lines[l, 0 + i] = -lines[l, 2]*(lines[l, 1] - lines[l, 0])/(lines[l, 3] - lines[l, 2]) + lines[l, 0]
+                    lines[l, 2 + i] = 0
+
+        for l in range(lines.shape[0]):
+            for i in range(2):
+                if np.min(lines[l, 2 + i]) > 1:
+                    lines[l, 0 + i] = (1 - lines[l, 2])*(lines[l, 1] - lines[l, 0])/(lines[l, 3] - lines[l, 2]) + lines[l, 0]
+                    lines[l, 2 + i] = 1
+
+        lines = lines[~np.all(lines == 0, axis = 1)]
 
     return lines
 
@@ -71,25 +89,15 @@ def crosshatch(img, layers = 10, blacks = 0, whites = 1, brightness = 0, number 
 
     lines = np.array([0, 0, 0, 0])
     
+    athresh = []
+    alines = []
+
     for i in range(layers):
         threshhold = (i/(layers - 1))*(whites - blacks) + blacks + brightness
-
         new = hatch(img, threshhold = threshhold, angle = angle + 70*i, number = number, cropped = True)
         lines = np.vstack((lines, new))
 
-    for l in range(lines.shape[0]):
-        for i in range(2):
-            if np.min(lines[l, 2 + i]) < 0:
-                lines[l, 0 + i] = -lines[l, 2]*(lines[l, 1] - lines[l, 0])/(lines[l, 3] - lines[l, 2]) + lines[l, 0]
-                lines[l, 2 + i] = 0
-
-    for l in range(lines.shape[0]):
-        for i in range(2):
-            if np.min(lines[l, 2 + i]) > 1:
-                lines[l, 0 + i] = (1 - lines[l, 2])*(lines[l, 1] - lines[l, 0])/(lines[l, 3] - lines[l, 2]) + lines[l, 0]
-                lines[l, 2 + i] = 1
-
-    lines = lines[~np.all(lines == 0, axis = 1)]
+    print('Number of lines: ', lines.shape[0])
 
     return lines
 
@@ -105,7 +113,6 @@ def preview(img, lines, lw = 1):
     ax[1].axis('off')
 
     plt.show()
-
 
 def cmyk_crosshatch(img, layers = 10, blacks = 0, whites = 1, number = 30, angle = 35):
     R = img[:, :, 2]
@@ -137,7 +144,7 @@ def cmyk_crosshatch(img, layers = 10, blacks = 0, whites = 1, number = 30, angle
 
     return clines, mlines, ylines, klines
 
-def cmyk_preview(clines, mlines, ylines, klines, lw = 2):
+def cmyk_preview(img, clines, mlines, ylines, klines, lw = 2):
     fig, ax = plt.subplots(1, 2, figsize = (11, 5))
 
     ax[0].imshow(cv2.cvtColor(crop(img), cv2.COLOR_BGR2RGB))
@@ -163,26 +170,26 @@ def levels(img):
     plt.show()
 
 if __name__ == "__main__":
-    img = np.zeros((200, 200))
-    lines = crosshatch(img, blacks = 0, whites = 1, layers = 5, number = 5)
-    preview(lines)
+    img = np.array(cv2.imread('snoof.jpg', 0))
+    lines = crosshatch(img, blacks = 0, whites = 0.6, layers = 5, number = 60)
+    preview(img, lines)
 
-    img = np.array(cv2.imread('ball2.jpg', 0))
-    lines = crosshatch(img, blacks = 0, whites = 0.9, layers = 7, number = 60)
-    preview(lines)
+    # img = np.array(cv2.imread('ball2.jpg', 0))
+    # lines = crosshatch(img, blacks = 0, whites = 0.9, layers = 7, number = 60)
+    # preview(img, lines)
 
-    img = np.array(cv2.imread('steve.jpg', 0))
-    lines = crosshatch(img, blacks = 0, whites = 0.9, layers = 7, number = 60)
-    preview(lines)
+    # img = np.array(cv2.imread('steve.jpg', 0))
+    # lines = crosshatch(img, blacks = 0, whites = 0.9, layers = 7, number = 60)
+    # preview(img, lines)
 
-    img = np.array(cv2.imread('lady.jpg', 0))
-    lines = crosshatch(img, blacks = 0, whites = 0.85, layers = 7, number = 60)
-    preview(lines)
+    # img = np.array(cv2.imread('lady.jpg', 0))
+    # lines = crosshatch(img, blacks = 0, whites = 0.85, layers = 7, number = 60)
+    # preview(img, lines)
 
-    img = np.array(cv2.imread('man.png'))
-    clines, mlines, ylines, klines = cmyk_crosshatch(img, blacks = 0, whites = 0.9, layers = 5, number = 30)
-    cmyk_preview(clines, mlines, ylines, klines)
+    # img = np.array(cv2.imread('man.png'))
+    # clines, mlines, ylines, klines = cmyk_crosshatch(img, blacks = 0, whites = 0.9, layers = 5, number = 30)
+    # cmyk_preview(img, clines, mlines, ylines, klines)
 
-    img = np.array(cv2.imread('starry.png'))
-    clines, mlines, ylines, klines = cmyk_crosshatch(img, blacks = 0, whites = 0.9, layers = 5, number = 30)
-    cmyk_preview(clines, mlines, ylines, klines)
+    # img = np.array(cv2.imread('starry.png'))
+    # clines, mlines, ylines, klines = cmyk_crosshatch(img, blacks = 0.1, whites = 0.9, layers = 5, number = 30)
+    # cmyk_preview(img, clines, mlines, ylines, klines)
