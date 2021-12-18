@@ -93,8 +93,6 @@ def crosshatch(img, layers = 10, blacks = 0, whites = 1, brightness = 0, number 
     alines = []
 
     for i in range(layers):
-        if i == layers - 1:
-            continue
         threshhold = (i/(layers - 1))*(whites - blacks) + blacks + brightness
         new = hatch(img, threshhold = threshhold, angle = angle + 70*i, number = number, cropped = True)
         lines = np.vstack((lines, new))
