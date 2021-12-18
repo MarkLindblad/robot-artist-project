@@ -10,7 +10,7 @@ def crop(img):
         img = img[(img.shape[0] - img.shape[1])//2:-(img.shape[0] - img.shape[1])//2, :]
     elif img.shape[0] < img.shape[1]:
         img = img[:, (img.shape[1] - img.shape[0])//2:-(img.shape[1] - img.shape[0])//2]
-    
+
     return img
 
 def hatch(img, threshhold = 0.5, angle = 45, number = 30, cropped = False):
@@ -35,7 +35,7 @@ def hatch(img, threshhold = 0.5, angle = 45, number = 30, cropped = False):
         done = True
         drawing = False
         new = np.array([0, 0, 0, 0])
-        
+
         for x in np.arange(0, img.shape[1] - 0.5, 0.5):
             y = m*x + b
             px = int(round(x))
@@ -53,7 +53,7 @@ def hatch(img, threshhold = 0.5, angle = 45, number = 30, cropped = False):
                         new = np.vstack((new, [x1, x/img.shape[1], y1, y/img.shape[0]]))
                     else:
                         new = np.vstack(([x/img.shape[1], x1, y/img.shape[0], y1], new))
-        
+
         if drawing:
             drawing = False
             if zigzag:
@@ -67,7 +67,7 @@ def hatch(img, threshhold = 0.5, angle = 45, number = 30, cropped = False):
 
         i += 1
 
-    if lines.shape[0] > 1:    
+    if lines.shape[0] > 1:
         for l in range(lines.shape[0]):
             for i in range(2):
                 if np.min(lines[l, 2 + i]) < 0:
@@ -88,13 +88,23 @@ def crosshatch(img, layers = 10, blacks = 0, whites = 1, brightness = 0, number 
     img = crop(img)
 
     lines = np.array([0, 0, 0, 0])
-    
+
+    grad_x = cv2.Scharr(img, cv2.CV_64F, 0, 1)
+    grad_y = cv2.Scharr(img, cv2.CV_64F, 1, 0)
+    for i in range(0, len(img), 5):
+        for j in range(0, len(img[i]), 5):
+            center = (j / len(img[i]), 1 - i / len(img))
+            norm = np.sqrt(grad_x[i][j] ** 2 + grad_y[i][j] ** 2)
+            if norm < 200:
+                continue
+            x_shift = grad_x[i][j] / 50000
+            y_shift = grad_y[i][j] / 50000
+            # lines = np.vstack((lines, np.array([center[0] - x_shift, center[0] + x_shift, center[1] - y_shift, center[1] + y_shift])))
+
     athresh = []
     alines = []
 
     for i in range(layers):
-        if i == layers - 1:
-            continue
         threshhold = (i/(layers - 1))*(whites - blacks) + blacks + brightness
         new = hatch(img, threshhold = threshhold, angle = angle + 70*i, number = number, cropped = True)
         lines = np.vstack((lines, new))
@@ -136,7 +146,7 @@ def cmyk_crosshatch(img, layers = 10, blacks = 0, whites = 1, number = 30, angle
                 C[y, x] = 255*(255 - R[y, x] - K[y, x])/(255 - K[y, x])
                 M[y, x] = 255*(255 - G[y, x] - K[y, x])/(255 - K[y, x])
                 Y[y, x] = 255*(255 - B[y, x] - K[y, x])/(255 - K[y, x])
-    
+
     clines = crosshatch(255 - C, layers = layers, blacks = blacks, whites = whites, number = number, angle = angle)
     mlines = crosshatch(255 - M, layers = layers, blacks = blacks, whites = whites, number = number, angle = angle + 45)
     ylines = crosshatch(255 - Y, layers = layers, blacks = blacks, whites = whites, number = number, angle = angle + 90)
@@ -172,8 +182,15 @@ def levels(img):
     plt.show()
 
 if __name__ == "__main__":
-    img = np.array(cv2.GaussianBlur(cv2.imread('1.jpg', 0), (19, 19), cv2.BORDER_DEFAULT))
-    lines = crosshatch(img, blacks = 0, whites = 0.75, layers = 8, number = 100)
+    # img = np.array(cv2.imread('snoof.jpg', 0))
+    img = np.array(cv2.GaussianBlur(cv2.imread('raven_huang.jpg', 0), (3, 3), cv2.BORDER_DEFAULT))
+    # img = cv2.imread('pearl_transparent.png', -1)
+    # mask = img[:,:,3] == 0
+    # img[mask] = [255, 255, 255, 255]
+    # img = cv2.cvtColor(img, cv2.COLOR_BGRA2GRAY)
+    # img = np.array(cv2.GaussianBlur(img, (5, 5), cv2.BORDER_DEFAULT))
+    # img = np.array(cv2.imread('raven_huang.jpg', 0))
+    lines = crosshatch(img, blacks = 0, whites = 0.9, layers = 15, number = 100)
     preview(img, lines)
 
     # img = np.array(cv2.imread('ball2.jpg', 0))

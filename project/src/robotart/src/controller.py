@@ -10,7 +10,7 @@ import rospy
 
 class Controller:
 
-    def __init__(self, up=-28, down=-43, x_image_offset=600, y_image_offset=0, z_image_offset=150):
+    def __init__(self, up=-7, down=-8, x_image_offset=600, y_image_offset=0, z_image_offset=150):
         self.limb = intera_interface.Limb('right')
         self.joint_names = self.limb.joint_names()
         self.pen_up_offset = up
@@ -19,13 +19,16 @@ class Controller:
         self.x_image_offset = x_image_offset
         self.y_image_offset = y_image_offset
         self.z_image_offset = z_image_offset
+        self.timeout = 15.0
+        self.threshold = 0.006
+        self.pen_number = 3 # 0, 1, 2, 3 for autonomous multicolor setup
 
     def joint_angles_to_dict(self, angles):
         return {self.joint_names[i]: angles[i] for i in range(len(self.joint_names))}
 
     def set_joint_angles(self, angles):
         angles_dict = self.joint_angles_to_dict(angles)
-        self.limb.move_to_joint_positions(angles_dict, timeout=15.0, threshold=0.005)
+        self.limb.move_to_joint_positions(angles_dict, timeout=self.timeout, threshold=self.threshold)
         # prev_angles = self.limb.joint_angles()
         # def test():
         #     cur_angles = self.limb.joint_angles()
@@ -38,7 +41,10 @@ class Controller:
         # self.limb.move_to_joint_positions(angles_dict, timeout=15.0, threshold=0.0, test=test)
 
     def move_to_robot_coords(self, rx, ry, rz, camera=False):
-        self.set_joint_angles(self.convert_robot_coords_to_joint_angles(rx, ry, rz, camera))
+        try:
+            self.set_joint_angles(self.convert_robot_coords_to_joint_angles(rx, ry, rz, camera))
+        except:
+            print("Skipped waypoint")
 
     def draw_image_point(self, ix, iy):
         rx, ry, rz = self.convert_image_to_robot_coords(ix, iy)
@@ -48,24 +54,25 @@ class Controller:
         self.move_to_robot_coords(rx, ry, rz + self.pen_down_offset)
         rospy.sleep(0.3)
         self.move_to_robot_coords(rx, ry, rz + self.pen_up_offset)
-        self.limb.set_joint_position_speed(0.3)
+        self.limb.set_joint_position_speed(0.1)
 
     def draw_image_line(self, ixs, iys, ixe, iye):
         self.limb.set_joint_position_speed(0.1)
         rxs, rys, rz = self.convert_image_to_robot_coords(ixs, iys)
         rxe, rye, rz = self.convert_image_to_robot_coords(ixe, iye)
         dist = math.sqrt((rxs - rxe) ** 2 + (rys - rye) ** 2)
-        steps = int(dist // 5) + 1
+        steps = int(dist // 15) + 1
         self.move_to_robot_coords(rxs, rys, rz + self.pen_up_offset)
-        self.limb.set_joint_position_speed(0.1)
+        # if (rxs - rxe) ** 2 + (rys - rye) ** 2 >= 25 ** 2:
+            # self.limb.set_joint_position_speed(0.07)
         rospy.sleep(0.3)
-        steps = 1 # TODO: REMOVE THIS
+        # steps = 1 # TODO: REMOVE THIS
         for i in range(steps + 1):
             rx = rxs + (rxe - rxs) * (i / steps)
             ry = rys + (rye - rys) * (i / steps)
             self.move_to_robot_coords(rx, ry, rz + self.pen_down_offset)
-            if i == 0:
-                self.limb.set_joint_position_speed(0.1)
+            # if i == 0:
+                # self.limb.set_joint_position_speed(0.1)
         self.limb.set_joint_position_speed(0.1)
         rospy.sleep(0.3)
         self.move_to_robot_coords(rxe, rye, rz + self.pen_up_offset)
@@ -104,7 +111,7 @@ class Controller:
         j3 = 0.0
         j4 = 2 * compress_angle
         j5 = 0.0
-        j6 = (0 if camera else math.pi / 2) - tilt_down_angle - compress_angle
-        j7 = math.pi / 2 + 0.15 # 0.15 for calibration adjustment on Ada
+        j6 = (0 if camera else math.pi / 2) - tilt_down_angle - compress_angle # - 0.2  (multicolor end effector offset)
+        j7 = (self.pen_number - 2) * math.pi / 2 + 0.15 # 0.15 for calibration adjustment on Ada
         return j1, j2, j3, j4, j5, j6, j7
 

@@ -30,15 +30,6 @@ def main():
 
     controller = Controller(x_image_offset=550, y_image_offset=-200)
     controller.limb.set_joint_position_speed(0.1)
-    controller.set_joint_angles([0.0] * 7)
-    return
-    for i in range(4):
-        controller.pen_number = i
-        controller.draw_image_line(-50, -50, -50, 50)
-        controller.draw_image_line(-50, 50, 50, 50)
-        controller.draw_image_line(50, 50, 50, -50)
-        controller.draw_image_line(50, -50, -50, -50)
-    return
 
     for i in range(4):
         # draw
